@@ -1,0 +1,58 @@
+import Koa from "koa";
+import koaBody from "koa-body";
+import Router from '@koa/router'
+import sequelize from "./db.js";
+import { getShopInfo, updateShopInfo, createShop, deleteShop } from "./services/shop.services.js";
+import cors from '@koa/cors'
+import passport from './guards/passport-jwt.js'
+import './models/index.js'
+import { generateToken } from "./helper/generate-jwt.js";
+import { createRole, duplicateRole, updateRole, deleteRole, getRole, getRoles } from "./services/role.services.js";
+
+const app = new Koa();
+const router = new Router({
+    prefix: '/api'
+}
+);
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+    allowedHeaders: ['content-type', 'Authorization', 'Origin', 'Access-Control-Allow-Origin', 'Accept', 'Options', 'X-Requested-With'],
+    exposedHeaders: ['Authorization'],
+    credentials: true,
+    optionsSuccessStatus: 200,
+}));
+app.use(koaBody());
+app.use(passport.initialize());
+app.use(
+    passport.authenticate("jwt", { session: false })
+);
+
+//SHOP ROUTERS
+router.get('/shop', async (ctx) => getShopInfo(ctx))
+router.patch('/shop/:id', async (ctx) => updateShopInfo(ctx));
+router.post('/shop', async (ctx) => createShop(ctx));
+router.delete('/shop/:id', async (ctx) => deleteShop(ctx));
+
+//ROLE ROUTERS
+router.post('/role', async (ctx) => createRole(ctx));
+router.post('/role/:id', async (ctx) => duplicateRole(ctx));
+router.get('/role/:id', async (ctx) => getRole(ctx));
+router.get('/roles', async (ctx) => getRoles(ctx));
+router.put('/role/:id', async (ctx) => updateRole(ctx));
+router.delete('/role/:id', async (ctx) => deleteRole(ctx));
+app
+    .use(router.routes())
+    .use(router.allowedMethods());
+(async () => {
+    try {
+        await sequelize.authenticate();
+        //await sequelize.sync();
+        console.log('Connection has been established successfully.');
+    } catch (error) {
+        console.error('Unable to connect to the database:', error);
+    }
+})()
+console.log(generateToken());
+
+app.listen(4000);
