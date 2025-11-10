@@ -37,8 +37,10 @@ router.delete('/shop/:id', async (ctx) => deleteShop(ctx));
 //ROLE ROUTERS
 router.post('/role', async (ctx) => createRole(ctx));
 router.post('/role/:id', async (ctx) => duplicateRole(ctx));
-router.get('/role/:id', async (ctx) => getRole(ctx));
+
+router.get('/roles/search', async (ctx) => getRole(ctx));
 router.get('/roles', async (ctx) => getRoles(ctx));
+
 router.put('/role/:id', async (ctx) => updateRole(ctx));
 router.delete('/role/:id', async (ctx) => deleteRole(ctx));
 app

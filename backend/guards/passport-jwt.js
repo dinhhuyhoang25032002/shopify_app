@@ -12,17 +12,13 @@ const opts = {
 passport.use(
     new JwtStrategy(opts, async (jwt_payload, done) => {
         try {
-            console.log(jwt_payload);
             const domain = new URL(jwt_payload.dest).hostname;
             const shop = await ShopModel.findOne(
                 {
                     where: { shop: domain },
                     raw: true
                 },
-
             );
-            console.log("shop:", shop);
-
             // jwt_payload là object decode từ token
             // Ví dụ: { id: 123, email: "user@example.com", iat: 1730821541, exp: 1730907941 }
 
@@ -30,7 +26,6 @@ passport.use(
             // const user = await User.findByPk(jwt_payload.id);
             if (shop) return done(null, shop);
             else return done(null, false);
-
             // 🔹 Nếu không có DB, chấp nhận luôn:
             // return done(null, jwt_payload);
         } catch (err) {

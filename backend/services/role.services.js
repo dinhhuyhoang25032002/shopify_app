@@ -1,5 +1,5 @@
 import RoleModel from "../models/role.model.js";
-
+import { Op } from "sequelize";
 export const createRole = async (ctx) => {
     try {
         const body = ctx.request.body;
@@ -28,7 +28,7 @@ export const duplicateRole = async (ctx) => {
             return;
         }
         delete roleData.id; // remove id to avoid conflict
-        roleData.name = roleData.name + "_copy"; // modify name to ensure uniqueness
+        roleData.name = roleData.name + "_copy_" + `${Date.now()}`; // modify name to ensure uniqueness
         const duplicatedRole = await RoleModel.create(roleData, { raw: true });
         ctx.status = 201;
         ctx.body = duplicatedRole;
@@ -84,17 +84,27 @@ export const deleteRole = async (ctx) => {
 
 export const getRole = async (ctx) => {
     try {
-        const roleId = ctx.params.id;
-        const roleData = await RoleModel.findOne({
-            where: { name: roleId },
-            raw: true
-        });
-        if (!roleData) {
-            ctx.status = 404;
-            ctx.body = "Role not found";
+        const keyword = ctx.query.name?.trim();
+        console.log(keyword);
+
+        if (!keyword) {
+            ctx.status = 400;
+            ctx.body = "Missing search keyword";
             return;
         }
-        ctx.body = roleData;
+
+        const roles = await RoleModel.findAll({
+            where: {
+                name: { [Op.like]: `%${keyword}%` }
+            },
+            raw: true
+        });
+        if (!roles.length) {
+            // ctx.status = 404;
+            ctx.body = [];
+            return;
+        }
+        ctx.body = roles;
         ctx.status = 200;
     }
     catch (error) {
