@@ -2,8 +2,8 @@ import { BrowserRouter } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { NavMenu } from "@shopify/app-bridge-react";
 import Routes from "./Routes";
-
-import { QueryProvider, PolarisProvider } from "./components";
+import { PolarisProvider } from "./components/providers/PolarisProvider";
+import { QueryProvider, } from "./components/providers/QueryProvider";
 
 export default function App() {
   // Any .tsx or .jsx files in /pages will become a route

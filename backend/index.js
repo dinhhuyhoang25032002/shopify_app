@@ -2,12 +2,14 @@ import Koa from "koa";
 import koaBody from "koa-body";
 import Router from '@koa/router'
 import sequelize from "./db.js";
-import { getShopInfo, updateShopInfo, createShop, deleteShop } from "./services/shop.services.js";
+import { getShopInfo, updateShopInfo, createShop, deleteShop } from "./services/shop.service.js";
 import cors from '@koa/cors'
 import passport from './guards/passport-jwt.js'
 import './models/index.js'
 import { generateToken } from "./helper/generate-jwt.js";
-import { createRole, duplicateRole, updateRole, deleteRole, getRole, getRoles } from "./services/role.services.js";
+import { createRole, duplicateRole, updateRole, deleteRole, getRole, getRoles } from "./services/role.service.js";
+import { GetProducts } from "./services/product.service.js";
+import { getProductTag } from "./services/product_tag.service.js";
 
 const app = new Koa();
 const router = new Router({
@@ -43,6 +45,13 @@ router.get('/roles', async (ctx) => getRoles(ctx));
 
 router.put('/role/:id', async (ctx) => updateRole(ctx));
 router.delete('/role/:id', async (ctx) => deleteRole(ctx));
+
+//PRODUCT ROUTERS
+router.get('/products', async (ctx) => GetProducts(ctx))
+
+//PRODUCT TAG ROUTERS
+router.get('/product-tag', async (ctx) => getProductTag(ctx))
+
 app
     .use(router.routes())
     .use(router.allowedMethods());

@@ -33,12 +33,22 @@ export const addNewShop = async (_req, res, next) => {
       await ShopModel.create({
         token: session.accessToken,
         email: data.body.data.shop.email,
-        sender_email: "hoangdinh2593@gmail.com",
+        sender_email: data.body.data.shop.email,
         shop: session.shop,
         first_name: data.body.data.shop.name,
         last_name: data.body.data.shop.plan.displayName,
       });
+    } else {
+      await shopData.update({
+        token: session.accessToken,
+        email: data.body.data.shop.email,
+        sender_email: data.body.data.shop.email,
+        shop: session.shop,
+        first_name: data.body.data.shop.name,
+        last_name: data.body.data.shop.plan.displayName,
+      })
     }
+
     // Lưu thông tin shop vào DB (sau này)
     next(); // chuyển sang middleware tiếp theo (redirectToShopifyOrAppRoot)
   } catch (err) {

@@ -10,10 +10,9 @@ import {
 } from "@shopify/polaris";
 import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
 import { useTranslation, Trans } from "react-i18next";
-
 import { trophyImage } from "../assets";
-
-import { ProductsCard, RoleTable } from "../components";
+import { ProductsCard, } from "../components/ProductsCard";
+import RoleTable from "../components/common/RoleTable";
 
 
 export default function RulePage() {

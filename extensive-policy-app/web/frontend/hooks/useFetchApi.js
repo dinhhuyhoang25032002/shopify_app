@@ -23,7 +23,10 @@ export function useFetchApi() {
             if (!res.ok) {
                 throw new Error(`Fetch failed with status: ${res.status}`);
             }
-
+            if (res.status === 401) {
+                console.warn("Token expired → refetching...");
+                throw new Error("UNAUTHORIZED");
+            }
             let payload;
             try {
                 payload = await res.json();

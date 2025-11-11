@@ -1,39 +1,37 @@
 import {
-  Card,
   Page,
   Layout,
-  TextContainer,
-  Image,
-  BlockStack,
-  Link,
-  Text,
 } from "@shopify/polaris";
 import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
 import { useTranslation, Trans } from "react-i18next";
 import { useQuery } from "react-query";
 import { trophyImage } from "../assets";
 
-import { ProductsCard, RoleTable } from "../components";
+import RoleTable from "../components/common/RoleTable";
 import { useEffect, useState } from "react";
 import EditRule from "../components/common/EditRule";
 import { useFetchApi } from "../hooks/useFetchApi";
 
-
 export default function HomePage() {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0)
-  const { handleFetchApi } = useFetchApi()
   const [isEditting, setEditting] = useState(false)
   const [ruleEdit, setRuleEdit] = useState(null)
+  const { handleFetchApi } = useFetchApi()
   const {
     data, refetch: refetchRules,
     isLoading: isLoadingCount,
   } = useQuery({
     queryKey: ["roles", index],
     queryFn: async () => handleFetchApi(`roles?index=${index}`),
-    staleTime: Infinity,
-    refetchOnWindowFocus: false,
-    keepPreviousData: true,
+    onError: (err) => {
+      if (err.message === "UNAUTHORIZED") {
+        refetchRules(); // Gọi lại API lấy token mới
+      }
+    }
+    // staleTime: Infinity,
+    // refetchOnWindowFocus: false,
+    // keepPreviousData: true,
   });
 
   const rule = data?.roles?.find((r) => r.id === ruleEdit) || null;

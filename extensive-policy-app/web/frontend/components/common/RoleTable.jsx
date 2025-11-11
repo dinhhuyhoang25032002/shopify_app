@@ -8,7 +8,7 @@ import {
   Badge,
 } from '@shopify/polaris';
 import { formatDate } from '../../helper/formatDate'
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, memo } from 'react';
 import { useFetchApi } from '../../hooks/useFetchApi'
 import { STATUS_ROLES, LIMIT } from '../../const';
 import { useNavigate } from "react-router-dom";
@@ -22,8 +22,9 @@ import { useDebounce } from '../../hooks/useDebounce';
 import {
   DuplicateIcon, EditIcon, DeleteIcon
 } from '@shopify/polaris-icons';
+import PaginationTable from './PaginationTable';
 
-export function RoleTable({
+export default memo(function RoleTable({
   setEditting,
   rules,
   isLoadingCount,
@@ -150,10 +151,6 @@ export function RoleTable({
 
   const { mode, setMode } = useSetIndexFiltersMode();
   const onHandleCancel = () => { };
-
-  const primaryAction = {
-
-  };
   useEffect(() => {
     const fetchSearch = async () => {
       if (!debouncedValue) {
@@ -183,11 +180,6 @@ export function RoleTable({
     [],
   );
 
-
-  // const resourceName = {
-  //   singular: 'order',
-  //   plural: 'orders',
-  // };
   const handleDuplicateRule = async (id) => {
     try {
       await handleFetchApi(`/role/${id}`, { method: "POST" })
@@ -233,10 +225,12 @@ export function RoleTable({
             {name}
           </Text></IndexTable.Cell>
         <IndexTable.Cell >
-          <Badge tone={status === STATUS_ROLES.ENABLE ? "success" : "warning"}>{status}</Badge>
+          <Text as="span" alignment='center'>
+            <Badge tone={status === STATUS_ROLES.ENABLE ? "success" : "warning"}>{status}</Badge>
+          </Text>
         </IndexTable.Cell>
         <IndexTable.Cell>
-          <Text numeric alignment='start'>
+          <Text numeric alignment='center'>
             {priority}
           </Text>
         </IndexTable.Cell>
@@ -310,8 +304,8 @@ export function RoleTable({
         headings={[
           { title: 'ID' },
           { title: 'Name' },
-          { title: 'Status' },
-          { title: 'Priority', alignment: 'start' },
+          { title: 'Status', alignment: 'center' },
+          { title: 'Priority', alignment: 'center' },
           { title: 'Create Date' },
           { title: 'Update Date' },
           { title: "Actions", alignment: 'center' }
@@ -337,15 +331,9 @@ export function RoleTable({
         )}
       </IndexTable>
       {!isLoadingCount && !isLoadingSearch && (
-        <div style={{ display: "flex", justifyContent: "center", padding: 8 }}>
-          <Pagination
-            onPrevious={() => setIndex((p) => Math.max(p - 1, 0))}
-            onNext={() => setIndex((p) => p + 1)}
-            hasNext
-            label={`${index * LIMIT + 1}-${Math.min((index + 1) * LIMIT, total) || 0} of ${total ?? 0} rules`}
-          />
-        </div>
+        <PaginationTable index={index} onNext={() => setIndex((p) => p + 1)} onPrevious={() => setIndex((p) => Math.max(p - 1, 0))} total={total} type={"rules"}/>
       )}
     </Card>
   );
-}
+})
+

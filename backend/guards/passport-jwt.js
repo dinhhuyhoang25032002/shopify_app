@@ -24,7 +24,7 @@ passport.use(
 
             // 🔹 Nếu bạn có DB user:
             // const user = await User.findByPk(jwt_payload.id);
-            if (shop) return done(null, shop);
+            if (shop) return done(null, { ...jwt_payload, shop });
             else return done(null, false);
             // 🔹 Nếu không có DB, chấp nhận luôn:
             // return done(null, jwt_payload);
