@@ -6,57 +6,50 @@ import {
   useIndexResourceState,
   Text,
   Badge,
-} from '@shopify/polaris';
-import { formatDate } from '../../helper/formatDate'
-import { useState, useCallback, useEffect, memo } from 'react';
-import { useFetchApi } from '../../hooks/useFetchApi'
-import { STATUS_ROLES, LIMIT } from '../../const';
+} from "@shopify/polaris";
+import { formatDate } from "../../helper/formatDate";
+import { useState, useCallback, useEffect, memo } from "react";
+import { useFetchApi } from "../../hooks/useFetchApi";
+import { STATUS_ROLES, LIMIT } from "../../const";
 import { useNavigate } from "react-router-dom";
-import {
-  PlusIcon
-} from '@shopify/polaris-icons';
-import { Button } from '@shopify/polaris';
-import { Pagination, Spinner } from '@shopify/polaris';
-import { useAppBridge } from '@shopify/app-bridge-react';
-import { useDebounce } from '../../hooks/useDebounce';
-import {
-  DuplicateIcon, EditIcon, DeleteIcon
-} from '@shopify/polaris-icons';
-import PaginationTable from './PaginationTable';
+import { PlusIcon } from "@shopify/polaris-icons";
+import { Button } from "@shopify/polaris";
+import { Pagination, Spinner } from "@shopify/polaris";
+import { useAppBridge } from "@shopify/app-bridge-react";
+import { useDebounce } from "../../hooks/useDebounce";
+import { DuplicateIcon, EditIcon, DeleteIcon } from "@shopify/polaris-icons";
+import PaginationTable from "./PaginationTable";
 
 export default memo(function RoleTable({
-  setEditting,
   rules,
   isLoadingCount,
   refetchRules,
   index,
-  setIndex, setRuleEdit,
+  setIndex,
   total,
 }) {
-
-  const { handleFetchApi } = useFetchApi()
+  const { handleFetchApi } = useFetchApi();
   const navigate = useNavigate();
-  const [sortSelected, setSortSelected] = useState(['id asc']);
-  const shopify = useAppBridge()
+  const [sortSelected, setSortSelected] = useState(["id asc"]);
+  const shopify = useAppBridge();
   const [search, setSearch] = useState(null);
   const debouncedValue = useDebounce(search);
   const [searchData, setSearchData] = useState(null);
-  const [isSearching, setSearching] = useState(false)
-  const [isLoadingSearch, setLoadingSearch] = useState(false)
+  const [isSearching, setSearching] = useState(false);
+  const [isLoadingSearch, setLoadingSearch] = useState(false);
 
   let listRules;
   if (isSearching) {
-    listRules = searchData ?? [];   // searchData luôn là array
+    listRules = searchData ?? []; // searchData luôn là array
   } else {
-    listRules = rules ?? [];  // default từ useQuery
+    listRules = rules ?? []; // default từ useQuery
   }
-  const sleep = (ms) =>
-    new Promise((resolve) => setTimeout(resolve, ms));
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   const [itemStrings, setItemStrings] = useState([]);
 
   useEffect(() => {
     if (rules.length !== undefined && total !== undefined) {
-      setItemStrings([`Show ${rules.length} of ${total} rules`,]);
+      setItemStrings([`Show ${rules.length} of ${total} rules`]);
     }
   }, [rules, total]);
   const deleteView = (index) => {
@@ -93,48 +86,48 @@ export default memo(function RoleTable({
   const tabs = itemStrings.map((item, index) => ({
     content: item,
     index,
-    onAction: () => { },
+    onAction: () => {},
     id: `${item}-${index}`,
     isLocked: index === 0,
     actions:
       index === 0
         ? []
         : [
-          {
-            type: 'rename',
-            onAction: () => { },
-            onPrimaryAction: async (value) => {
-              const newItemsStrings = tabs.map((item, idx) => {
-                if (idx === index) {
-                  return value;
-                }
-                return item.content;
-              });
-              await sleep(1);
-              setItemStrings(newItemsStrings);
-              return true;
+            {
+              type: "rename",
+              onAction: () => {},
+              onPrimaryAction: async (value) => {
+                const newItemsStrings = tabs.map((item, idx) => {
+                  if (idx === index) {
+                    return value;
+                  }
+                  return item.content;
+                });
+                await sleep(1);
+                setItemStrings(newItemsStrings);
+                return true;
+              },
             },
-          },
-          {
-            type: 'duplicate',
-            onPrimaryAction: async (value) => {
-              await sleep(1);
-              duplicateView(value);
-              return true;
+            {
+              type: "duplicate",
+              onPrimaryAction: async (value) => {
+                await sleep(1);
+                duplicateView(value);
+                return true;
+              },
             },
-          },
-          {
-            type: 'edit',
-          },
-          {
-            type: 'delete',
-            onPrimaryAction: async () => {
-              await sleep(1);
-              deleteView(index);
-              return true;
+            {
+              type: "edit",
             },
-          },
-        ],
+            {
+              type: "delete",
+              onPrimaryAction: async () => {
+                await sleep(1);
+                deleteView(index);
+                return true;
+              },
+            },
+          ],
   }));
   const [selected, setSelected] = useState(0);
 
@@ -143,14 +136,14 @@ export default memo(function RoleTable({
     // { label: 'Order', value: 'order desc', directionLabel: 'Descending' },
     // { label: 'Customer', value: 'customer asc', directionLabel: 'A-Z' },
     // { label: 'Customer', value: 'customer desc', directionLabel: 'Z-A' },
-    { label: 'ID', value: 'id asc', directionLabel: 'Ascending' },
-    { label: 'ID', value: 'id desc', directionLabel: 'Descending' },
-    { label: 'Priority', value: 'priority asc', directionLabel: 'Ascending' },
-    { label: 'Priority', value: 'priority desc', directionLabel: 'Descending' },
+    { label: "ID", value: "id asc", directionLabel: "Ascending" },
+    { label: "ID", value: "id desc", directionLabel: "Descending" },
+    { label: "Priority", value: "priority asc", directionLabel: "Ascending" },
+    { label: "Priority", value: "priority desc", directionLabel: "Descending" },
   ];
 
   const { mode, setMode } = useSetIndexFiltersMode();
-  const onHandleCancel = () => { };
+  const onHandleCancel = () => {};
   useEffect(() => {
     const fetchSearch = async () => {
       if (!debouncedValue) {
@@ -158,57 +151,53 @@ export default memo(function RoleTable({
         setSearching(false);
         return;
       }
-      setSearching(true)
+      setSearching(true);
       try {
-        setLoadingSearch(true)
-        const result = await handleFetchApi(`roles/search?name=${debouncedValue}`);
+        setLoadingSearch(true);
+        const result = await handleFetchApi(
+          `roles/search?name=${debouncedValue}`
+        );
         setSearchData(result);
       } catch (error) {
-        throw error
+        throw error;
       } finally {
-        setLoadingSearch(false)
+        setLoadingSearch(false);
       }
     };
 
     fetchSearch();
   }, [debouncedValue]);
 
-  const handleFiltersQueryChange = useCallback(
-    async (value) => {
-      setSearch(value)
-    },
-    [],
-  );
+  const handleFiltersQueryChange = useCallback(async (value) => {
+    setSearch(value);
+  }, []);
 
   const handleDuplicateRule = async (id) => {
     try {
-      await handleFetchApi(`/role/${id}`, { method: "POST" })
+      await handleFetchApi(`/role/${id}`, { method: "POST" });
     } catch (error) {
-      throw error
+      throw error;
     } finally {
-      shopify.toast.show("Created Copy Rule.")
-      await refetchRules()
+      shopify.toast.show("Created Copy Rule.");
+      await refetchRules();
     }
-  }
+  };
 
   const handleDeleteRule = async (id) => {
     try {
-      await handleFetchApi(`/role/${id}`, { method: "DELETE" })
+      await handleFetchApi(`/role/${id}`, { method: "DELETE" });
     } catch (error) {
-      throw error
+      throw error;
     } finally {
-      shopify.toast.show("Deleted Rule successfully.")
-      await refetchRules()
+      shopify.toast.show("Deleted Rule successfully.");
+      await refetchRules();
     }
-  }
+  };
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
     useIndexResourceState(listRules);
   const rowMarkup = listRules.map(
-    (
-      { id, name, priority, createdAt, updatedAt, status },
-      index,
-    ) => (
+    ({ id, name, priority, createdAt, updatedAt, status }, index) => (
       <IndexTable.Row
         id={id}
         key={id}
@@ -216,54 +205,88 @@ export default memo(function RoleTable({
         position={index}
       >
         <IndexTable.Cell>
-          <Text as="span" >
-            {id}
-          </Text>
+          <Text as="span">{id}</Text>
         </IndexTable.Cell>
-        <IndexTable.Cell >
+        <IndexTable.Cell>
           <Text numeric as="span" fontWeight="bold">
             {name}
-          </Text></IndexTable.Cell>
-        <IndexTable.Cell >
-          <Text as="span" alignment='center'>
-            <Badge tone={status === STATUS_ROLES.ENABLE ? "success" : "warning"}>{status}</Badge>
           </Text>
         </IndexTable.Cell>
         <IndexTable.Cell>
-          <Text numeric alignment='center'>
+          <Text as="span" alignment="center">
+            <Badge
+              tone={status === STATUS_ROLES.ENABLE ? "success" : "warning"}
+            >
+              {status}
+            </Badge>
+          </Text>
+        </IndexTable.Cell>
+        <IndexTable.Cell>
+          <Text numeric alignment="center">
             {priority}
           </Text>
         </IndexTable.Cell>
         <IndexTable.Cell>{formatDate(createdAt)}</IndexTable.Cell>
         <IndexTable.Cell>{formatDate(updatedAt)}</IndexTable.Cell>
-        <IndexTable.Cell >
-          <div style={{
-            display: "flex", justifyContent: "center", width: "100%", alignItems: "center", gap: 5
-          }
-          }>
-            <Button icon={EditIcon} accessibilityLabel="Edit Role" disabled={allResourcesSelected} onClick={(e) => {
-              e.stopPropagation()
-              setRuleEdit(id)
-              setEditting(true)
-            }} />
-            <Button icon={DuplicateIcon} accessibilityLabel="Duplicate Role" onClick={(e) => {
-              e.stopPropagation()
-              handleDuplicateRule(id)
-            }} />
-            <Button icon={DeleteIcon} accessibilityLabel="Delete Role" onClick={(e) => {
-              e.stopPropagation()
-              handleDeleteRule(id)
-            }} />
-          </div></IndexTable.Cell>
+        <IndexTable.Cell>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              width: "100%",
+              alignItems: "center",
+              gap: 5,
+            }}
+          >
+            <Button
+              icon={EditIcon}
+              accessibilityLabel="Edit Role"
+              disabled={allResourcesSelected}
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/rule/${name}`);
+              }}
+            />
+            <Button
+              icon={DuplicateIcon}
+              accessibilityLabel="Duplicate Role"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDuplicateRule(id);
+              }}
+            />
+            <Button
+              icon={DeleteIcon}
+              accessibilityLabel="Delete Role"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteRule(name);
+              }}
+            />
+          </div>
+        </IndexTable.Cell>
       </IndexTable.Row>
-    ),
+    )
   );
   console.log(allResourcesSelected);
 
   return (
-    <Card >
-      <div style={{ width: '100%', display: "flex", justifyContent: "end", padding: "8px 12px 3px 8px" }}>
-        <Button icon={PlusIcon} variant="primary" onClick={() => navigate("/rule")}>Add Rule</Button>
+    <Card>
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "end",
+          padding: "8px 12px 3px 8px",
+        }}
+      >
+        <Button
+          icon={PlusIcon}
+          variant="primary"
+          onClick={() => navigate("/rule")}
+        >
+          Add Rule
+        </Button>
       </div>
       <IndexFilters
         sortOptions={sortOptions}
@@ -271,7 +294,7 @@ export default memo(function RoleTable({
         queryValue={search}
         queryPlaceholder="Searching in all"
         onQueryChange={handleFiltersQueryChange}
-        onQueryClear={() => setSearch('')}
+        onQueryClear={() => setSearch("")}
         onSort={setSortSelected}
         //    primaryAction={primaryAction}
         cancelAction={{
@@ -285,7 +308,7 @@ export default memo(function RoleTable({
         canCreateNewView={false}
         filters={[]}
         appliedFilters={[]}
-        onClearAll={() => { }}
+        onClearAll={() => {}}
         mode={mode}
         setMode={setMode}
         hideFilters
@@ -297,21 +320,21 @@ export default memo(function RoleTable({
           isLoadingCount || isLoadingSearch
             ? 0
             : allResourcesSelected
-              ? "All"
-              : selectedResources.length
+            ? "All"
+            : selectedResources.length
         }
         onSelectionChange={handleSelectionChange}
         headings={[
-          { title: 'ID' },
-          { title: 'Name' },
-          { title: 'Status', alignment: 'center' },
-          { title: 'Priority', alignment: 'center' },
-          { title: 'Create Date' },
-          { title: 'Update Date' },
-          { title: "Actions", alignment: 'center' }
+          { title: "ID" },
+          { title: "Name" },
+          { title: "Status", alignment: "center" },
+          { title: "Priority", alignment: "center" },
+          { title: "Create Date" },
+          { title: "Update Date" },
+          { title: "Actions", alignment: "center" },
         ]}
       >
-        {(isLoadingCount || isLoadingSearch) ? (
+        {isLoadingCount || isLoadingSearch ? (
           <IndexTable.Row>
             <IndexTable.Cell colSpan={6}>
               <div
@@ -331,9 +354,14 @@ export default memo(function RoleTable({
         )}
       </IndexTable>
       {!isLoadingCount && !isLoadingSearch && (
-        <PaginationTable index={index} onNext={() => setIndex((p) => p + 1)} onPrevious={() => setIndex((p) => Math.max(p - 1, 0))} total={total} type={"rules"}/>
+        <PaginationTable
+          index={index}
+          onNext={() => setIndex((p) => p + 1)}
+          onPrevious={() => setIndex((p) => Math.max(p - 1, 0))}
+          total={total}
+          type={"rules"}
+        />
       )}
     </Card>
   );
-})
-
+});

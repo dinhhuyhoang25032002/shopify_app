@@ -1,9 +1,12 @@
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { NavMenu } from "@shopify/app-bridge-react";
 import Routes from "./Routes";
 import { PolarisProvider } from "./components/providers/PolarisProvider";
-import { QueryProvider, } from "./components/providers/QueryProvider";
+import { QueryProvider } from "./components/providers/QueryProvider";
+import { store } from "./stores/redux-toolkit/store";
+import { Provider } from "react-redux";
+import ShopLayout from "./components/layout/ShopLayout";
 
 export default function App() {
   // Any .tsx or .jsx files in /pages will become a route
@@ -15,16 +18,20 @@ export default function App() {
 
   return (
     <PolarisProvider>
-      <BrowserRouter>
-        <QueryProvider>
-          <NavMenu>
-            <a href="/" rel="home" />
-            <a href="/pagename">{t("NavigationMenu.pageName")}</a>
-            <a href="/rule">{t("NavigationMenu.rule")}</a>
-          </NavMenu>
-          <Routes pages={pages} />
-        </QueryProvider>
-      </BrowserRouter>
+      <Provider store={store}>
+        <ShopLayout>
+          <BrowserRouter>
+            <QueryProvider>
+              <NavMenu>
+                <Link to="/" rel="home" />
+                <Link to="/products">{t("NavigationMenu.products")}</Link>
+                <Link to="/rules">{t("NavigationMenu.rules")}</Link>
+              </NavMenu>
+              <Routes pages={pages} />
+            </QueryProvider>
+          </BrowserRouter>
+        </ShopLayout>
+      </Provider>
     </PolarisProvider>
   );
 }

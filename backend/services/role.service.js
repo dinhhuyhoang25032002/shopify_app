@@ -82,7 +82,7 @@ export const deleteRole = async (ctx) => {
     }
 }
 
-export const getRole = async (ctx) => {
+export const getRolesBySearch = async (ctx) => {
     try {
         const keyword = ctx.query.name?.trim();
         console.log(keyword);
@@ -135,4 +135,36 @@ export const getRoles = async (ctx) => {
         ctx.body = "Error fetching roles";
         console.log(error);
     }
+}
+
+export const getRole = async (ctx) => {
+    try {
+        const name = ctx.params.id;
+        console.log("name", name);
+
+        if (!name) {
+            ctx.status = 400
+            ctx.body = "Missing param important."
+            return
+        }
+        const rule = await RoleModel.findOne({
+            where: {
+                name: name
+            },
+            raw: true
+        })
+        console.log(rule);
+
+        if (!rule) {
+            ctx.status = 404
+            ctx.body = "Not found rule."
+            return
+        }
+        ctx.status = 200
+        ctx.body = rule
+    } catch (error) {
+        ctx.status = 500
+        ctx.body = "Error from server."
+    }
+
 }

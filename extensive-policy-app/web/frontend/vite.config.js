@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import react from "@vitejs/plugin-react";
-
+import path from 'path';
 if (
   process.env.npm_lifecycle_event === "build" &&
   !process.env.CI &&
@@ -10,7 +10,7 @@ if (
 ) {
   throw new Error(
     "\n\nThe frontend build will not work without an API key. Set the SHOPIFY_API_KEY environment variable when running the build command, for example:" +
-      "\n\nSHOPIFY_API_KEY=<your-api-key> npm run build\n"
+    "\n\nSHOPIFY_API_KEY=<your-api-key> npm run build\n"
   );
 }
 
@@ -49,6 +49,9 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     preserveSymlinks: true,
+    alias: {
+      "@": path.resolve(__dirname, './frontend'),
+    }
   },
   server: {
     host: "localhost",

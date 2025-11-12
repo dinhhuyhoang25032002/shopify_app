@@ -17,6 +17,7 @@
     "@shopify/shopify-app-session-storage-sqlite": "^4.0.20",
     "compression": "^1.8.1",
     "cross-env": "^7.0.3",
+    "dotenv": "^17.2.3",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7"
   },

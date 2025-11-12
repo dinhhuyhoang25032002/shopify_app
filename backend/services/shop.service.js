@@ -1,19 +1,13 @@
 import ShopModel from "../models/shop.model.js";
 export const getShopInfo = async (ctx) => {
   try {
-    const domain = ctx.state.user.shop;
-    console.log('asdasd', domain);
-
-    const shopData = await ShopModel.findOne({
-      where: { shop: domain },
-      raw: true
-    })
-
+    const shopData = ctx.state.user.shop;
     if (!shopData) {
       ctx.status = 404;
       ctx.body = "Shop not found";
       return;
     }
+    delete shopData.token
     ctx.body = shopData;
     ctx.status = 200;
   } catch (err) {
@@ -26,6 +20,7 @@ export const updateShopInfo = async (ctx) => {
   try {
     const body = ctx.request.body;
     const shopId = ctx.params.id;
+    console.log(body);
 
     const [result] = await ShopModel.update(body, {
       where: { shop: shopId }

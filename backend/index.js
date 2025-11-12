@@ -7,7 +7,7 @@ import cors from '@koa/cors'
 import passport from './guards/passport-jwt.js'
 import './models/index.js'
 import { generateToken } from "./helper/generate-jwt.js";
-import { createRole, duplicateRole, updateRole, deleteRole, getRole, getRoles } from "./services/role.service.js";
+import { createRole, duplicateRole, updateRole, deleteRole, getRole, getRoles, getRolesBySearch } from "./services/role.service.js";
 import { GetProducts } from "./services/product.service.js";
 import { getProductTag } from "./services/product_tag.service.js";
 
@@ -40,7 +40,8 @@ router.delete('/shop/:id', async (ctx) => deleteShop(ctx));
 router.post('/role', async (ctx) => createRole(ctx));
 router.post('/role/:id', async (ctx) => duplicateRole(ctx));
 
-router.get('/roles/search', async (ctx) => getRole(ctx));
+router.get('/roles/search', async (ctx) => getRolesBySearch(ctx));
+router.get('/roles/:id', async (ctx) => getRole(ctx));
 router.get('/roles', async (ctx) => getRoles(ctx));
 
 router.put('/role/:id', async (ctx) => updateRole(ctx));

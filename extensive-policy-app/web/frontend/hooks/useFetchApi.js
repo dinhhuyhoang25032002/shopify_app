@@ -12,12 +12,15 @@ export function useFetchApi() {
         try {
             setLoading(true)
             const token = await shopify.idToken();
+            console.log("token", token);
+
             const res = await fetch(fullUrl, {
                 ...options,
                 headers: {
                     ...(options.headers || {}),
                     'Authorization': `Bearer ${token}`,
-                    'ngrok-skip-browser-warning': 'true'
+                    'ngrok-skip-browser-warning': 'true',
+                    "Content-Type": "application/json",
                 },
             })
             if (!res.ok) {
