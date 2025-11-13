@@ -1,7 +1,7 @@
 # Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
 
 client_id = "1a28349fe7659977acfb7bd2dc4daf77"
-name = "extensive-policy-app"
+name = "DEV HoangDH mini app"
 application_url = "https://untenuous-li-frothily.ngrok-free.dev"
 embedded = true
 
