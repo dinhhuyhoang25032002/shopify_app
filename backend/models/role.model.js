@@ -21,9 +21,18 @@ const RoleModel = sequelize.define("Role", {
         allowNull: false,
         defaultValue: 0
     },
+    apply: {
+        type: DataTypes.ENUM("All,TAGS"),
+        defaultValue: "All"
+    },
     type: {
         type: DataTypes.ENUM("PERCENTAGE", "FIXED_AMOUNT", "SET_PRICE"),
         allowNull: false,
+        defaultValue: "SET_PRICE"
+    },
+    tags: {
+        type: DataTypes.JSON()
     }
 });
+
 export default RoleModel

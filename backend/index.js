@@ -43,8 +43,7 @@ router.post('/role/:id', async (ctx) => duplicateRole(ctx));
 router.get('/roles/search', async (ctx) => getRolesBySearch(ctx));
 router.get('/roles/:id', async (ctx) => getRole(ctx));
 router.get('/roles', async (ctx) => getRoles(ctx));
-
-router.put('/role/:id', async (ctx) => updateRole(ctx));
+router.patch('/roles/:id', async (ctx) => updateRole(ctx));
 router.delete('/role/:id', async (ctx) => deleteRole(ctx));
 
 //PRODUCT ROUTERS
@@ -59,7 +58,7 @@ app
 (async () => {
     try {
         await sequelize.authenticate();
-        //await sequelize.sync();
+        // await sequelize.sync({ alter: true });
         console.log('Connection has been established successfully.');
     } catch (error) {
         console.error('Unable to connect to the database:', error);

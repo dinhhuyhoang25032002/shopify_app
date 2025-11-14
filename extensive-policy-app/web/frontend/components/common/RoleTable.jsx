@@ -19,6 +19,7 @@ import { useAppBridge } from "@shopify/app-bridge-react";
 import { useDebounce } from "../../hooks/useDebounce";
 import { DuplicateIcon, EditIcon, DeleteIcon } from "@shopify/polaris-icons";
 import PaginationTable from "./PaginationTable";
+import ModalAddRule from "./ModalAddRule";
 
 export default memo(function RoleTable({
   rules,
@@ -37,7 +38,6 @@ export default memo(function RoleTable({
   const [searchData, setSearchData] = useState(null);
   const [isSearching, setSearching] = useState(false);
   const [isLoadingSearch, setLoadingSearch] = useState(false);
-
   let listRules;
   if (isSearching) {
     listRules = searchData ?? []; // searchData luôn là array
@@ -268,7 +268,7 @@ export default memo(function RoleTable({
       </IndexTable.Row>
     )
   );
-  console.log(allResourcesSelected);
+  console.log("ádasdsad");
 
   return (
     <Card>
@@ -283,7 +283,7 @@ export default memo(function RoleTable({
         <Button
           icon={PlusIcon}
           variant="primary"
-          onClick={() => navigate("/rule")}
+          onClick={() => shopify.modal.show("my-modal")}
         >
           Add Rule
         </Button>
@@ -336,7 +336,7 @@ export default memo(function RoleTable({
       >
         {isLoadingCount || isLoadingSearch ? (
           <IndexTable.Row>
-            <IndexTable.Cell colSpan={6}>
+            <IndexTable.Cell colSpan={7}>
               <div
                 style={{
                   width: "100%",
@@ -362,6 +362,7 @@ export default memo(function RoleTable({
           type={"rules"}
         />
       )}
+      <ModalAddRule refetchRules={refetchRules} />
     </Card>
   );
 });

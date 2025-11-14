@@ -2,7 +2,6 @@ import {
   Card,
   Page,
   Layout,
-  TextContainer,
   Thumbnail,
   Image,
   DataTable,
@@ -10,6 +9,7 @@ import {
   Text,
   IndexTable,
   useIndexResourceState,
+  Spinner,
 } from "@shopify/polaris";
 import { NoteIcon } from "@shopify/polaris-icons";
 import { useQuery } from "react-query";
@@ -121,7 +121,7 @@ export default memo(function ProductionList({
     );
   });
 
-  if (isLoading) return <div>Loading...</div>;
+  // if (isLoading) return <div>Loading...</div>;
 
   return (
     <>
@@ -164,11 +164,13 @@ export default memo(function ProductionList({
           rowMarkup
         )}
       </IndexTable>
-      <PaginationTable
-        index={index}
-        type={"products"}
-        total={productCount?.count}
-      />
+      {!isLoadingCount && (
+        <PaginationTable
+          index={index}
+          type={"products"}
+          total={productCount?.count}
+        />
+      )}
     </>
   );
 });

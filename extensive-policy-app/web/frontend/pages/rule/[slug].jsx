@@ -18,38 +18,61 @@ import ProductionList from "../../components/common/ProductionList";
 import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import { useFetchApi } from "../../hooks/useFetchApi";
+import SkeletonExample from "../../components/layout/SkeletonPage";
+import { useAppBridge } from "@shopify/app-bridge-react";
 export default function EditRule() {
-  const handleSubmit = () => {};
   const { slug } = useParams();
   const { handleFetchApi } = useFetchApi();
-  const { isLoading, data, error } = useQuery({
+  const { isLoading, data, error, refetch } = useQuery({
     queryKey: ["rule", slug],
     queryFn: () => handleFetchApi(`roles/${slug}`),
+    refetchOnWindowFocus: false,
   });
   const [statusValue, setStatusValue] = useState(STATUS_ROLES.ENABLE);
-  const [applyType, setApplyType] = useState("all"); // all | tags
-  const [discountType, setDiscountType] = useState("set_price");
+  const [applyType, setApplyType] = useState(APPLY_TYPE.ALL); // all | tags
+  const [discountType, setDiscountType] = useState(DISCOUNT_TYPE.SET_PRICE);
   const [activeTags, setActiveTags] = useState([]); // mảng chứa item đã chọn
-
+  const shopify = useAppBridge();
   const [value, setValue] = useState("");
   useEffect(() => {
     if (data?.status) {
       setStatusValue(data.status);
     }
   }, [data?.status]);
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <SkeletonExample />;
   if (error) return <div>try again</div>;
   const { name, priority } = data;
-  console.log("data", slug);
-
+  console.log("data", applyType);
+  const handleSubmit = async () => {
+    try {
+      await handleFetchApi(`roles/${slug}`, {
+        method: "PATCH",
+        body: JSON.stringify({
+          status: statusValue,
+          type: discountType,
+          tags: activeTags,
+          apply: applyType,
+        }),
+      });
+      shopify.toast.show("Change rule successfully.");
+      await refetch();
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <Page>
       <Card>
         <Form onSubmit={handleSubmit}>
           <FormLayout>
-            <Text variant="headingXl" as="h3">
-              Edit custom pricing rule "{name}"
-            </Text>
+            <InlineStack align="space-between">
+              <Text variant="headingXl" as="h3">
+                Edit custom pricing rule "{name}"
+              </Text>
+              <Button tone="success" variant="primary" submit>
+                Submit
+              </Button>
+            </InlineStack>
 
             <InlineGrid gap="500" columns={2}>
               <TextField

@@ -43,10 +43,14 @@ export const updateRole = async (ctx) => {
     try {
         const body = ctx.request.body;
         const roleId = ctx.params.id;
-        const [result] = await RoleModel.update(body, {
-            where: { id: roleId }
+        const tagsJson = Object.fromEntries(body.tags.map(tag => [tag, tag]));
+        console.log(tagsJson);
+
+        const [result] = await RoleModel.update({ ...body, tags: tagsJson }, {
+            where: { name: roleId }
         });
-        console.log(result);
+        console.log("body", result);
+
         if (result !== 0) {
             ctx.status = 200;
             ctx.body = "Role updated successfully";
@@ -121,9 +125,9 @@ export const getRoles = async (ctx) => {
             RoleModel.findAll({
                 raw: true,
                 limit: 10,
-                offset: index * 10,    // skip index*10 records
+                offset: index * 10,
             }),
-            RoleModel.count(),        // total records
+            RoleModel.count(),
         ]);
         ctx.body = {
             roles,
@@ -165,6 +169,8 @@ export const getRole = async (ctx) => {
     } catch (error) {
         ctx.status = 500
         ctx.body = "Error from server."
+        console.log(error);
+
     }
 
 }

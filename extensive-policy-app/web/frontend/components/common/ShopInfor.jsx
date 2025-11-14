@@ -70,6 +70,7 @@ export default function ShopInfor() {
               style={{
                 width: "80%",
               }}
+              priority
             />
           </div>
         </InlineGrid>

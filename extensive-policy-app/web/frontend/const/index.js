@@ -6,10 +6,10 @@ export const STATUS_ROLES = {
 export const LIMIT = 10
 
 export const APPLY_TYPE = {
-    ALL: 'all', TAGS: "tags"
+    ALL: 'ALL', TAGS: "TAGS"
 }
 export const DISCOUNT_TYPE = {
-    SET_PRICE: "set_price",
-    FIXED: "fixed",
-    PERCENT: "percent"
+    SET_PRICE: "PERCENTAGE",
+    FIXED: "FIXED_AMOUNT",
+    PERCENT: "PERCENTAGE"
 }
