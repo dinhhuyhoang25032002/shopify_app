@@ -1,0 +1,10 @@
+version: 3
+agent:
+  authtoken: 34xdNct6a1cBbA6nl2ZP1kpNZaD_dLmSZkBymBArVLZF5SQj
+tunnels:
+  first:
+    proto: http
+    addr: http://localhost:3000
+  second:
+    proto: http
+    addr: 4000
