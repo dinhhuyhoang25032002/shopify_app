@@ -24,10 +24,6 @@ const ShopModel = sequelize.define("Shop", {
         type: DataTypes.STRING,
         allowNull: false,
     },
-    last_name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
     sender_email: {
         type: DataTypes.STRING,
         allowNull: false,

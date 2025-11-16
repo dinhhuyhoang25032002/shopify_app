@@ -1,0 +1,19 @@
+import Router from '@koa/router';
+import { getShopInfo, createShop, updateShopInfo, deleteShop } from '@/controllers/shop.controller';
+const router = new Router({
+  prefix: '/shop',
+});
+
+// GET
+router.get('/', getShopInfo);
+
+//POST
+router.post('/', createShop);
+
+//PATCH
+router.patch('/:id', async ctx => updateShopInfo);
+
+// DELETE
+router.delete('/:id', async ctx => deleteShop);
+
+export default router;

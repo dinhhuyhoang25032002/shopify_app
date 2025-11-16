@@ -1,4 +1,4 @@
-import ShopModel from '../models/shop.model.js';
+import ShopModel from '@/models/shop.model';
 import shopify from '../shopify.js';
 export const addNewShop = async (_req, res, next) => {
 
@@ -36,7 +36,6 @@ export const addNewShop = async (_req, res, next) => {
         sender_email: data.body.data.shop.email,
         shop: session.shop,
         first_name: data.body.data.shop.name,
-        last_name: data.body.data.shop.plan.displayName,
       });
     } else {
       await shopData.update({
@@ -45,7 +44,6 @@ export const addNewShop = async (_req, res, next) => {
         sender_email: data.body.data.shop.email,
         shop: session.shop,
         first_name: data.body.data.shop.name,
-        last_name: data.body.data.shop.plan.displayName,
       })
     }
 
