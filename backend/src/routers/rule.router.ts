@@ -8,7 +8,7 @@ import {
   updateRule
 } from 'src/controllers/rule.controller'
 import { RuleDto } from 'src/dto/rule.dto'
-import { validateBody } from 'src/middleware/validate-payload'
+import { validateBody } from '@/middleware/validatePayload'
 import Router from '@koa/router'
 const router = new Router({
   prefix: '/rules'

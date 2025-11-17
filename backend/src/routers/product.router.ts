@@ -1,10 +1,10 @@
-import Router from '@koa/router';
-import { getProducts } from 'src/controllers/product.controller';
+import Router from '@koa/router'
+import { getProducts, getProductTag } from '@/controllers/product.controller'
 const router = new Router({
-  prefix: '/products',
-});
+  prefix: '/products'
+})
 
 // GET
-router.get('/', getProducts);
-
-export default router;
+router.get('/', getProducts)
+router.get('/tags', getProductTag)
+export default router

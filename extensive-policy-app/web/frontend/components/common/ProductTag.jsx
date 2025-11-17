@@ -11,7 +11,7 @@ export default memo(function ProductTag({ activeTags, setActiveTags, applyType }
     const { handleFetchApi } = useFetchApi()
     const { data, isLoading } = useQuery({
         queryKey: ['product-tag'],
-        queryFn: async () => handleFetchApi(`product-tag`)
+        queryFn: async () => handleFetchApi(`products/tags`)
     })
     const togglePopoverActive = useCallback(
         () => setPopoverActive((active) => !active),

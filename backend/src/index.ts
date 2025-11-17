@@ -2,13 +2,13 @@ import Koa from 'koa'
 import koaBody from 'koa-body'
 import Router from '@koa/router'
 import cors from '@koa/cors'
-import passport from './guards/passport-jwt'
+import passport from './guards/passportJwt'
  import 'src/models/index';
-import { generateToken } from 'src/util/generate-jwt'
+import { generateToken } from '@/util/generateJwt'
 import shopRouter from 'src/routers/shop.router'
 import ruleRouter from 'src/routers/rule.router'
 import productRouter from 'src/routers/product.router'
-import productTagRouter from 'src/routers/product-tag.router'
+
 
 import sequelize from 'src/database/index'
 const app = new Koa()
@@ -40,9 +40,6 @@ router.use(ruleRouter.routes()).use(shopRouter.allowedMethods())
 
 //PRODUCT ROUTERS
 router.use(productRouter.routes()).use(shopRouter.allowedMethods())
-
-//PRODUCT TAG ROUTERS
-router.use(productTagRouter.routes()).use(shopRouter.allowedMethods())
 
 app.use(router.routes()).use(router.allowedMethods())
 ;(async () => {
