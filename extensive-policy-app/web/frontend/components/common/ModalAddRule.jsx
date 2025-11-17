@@ -25,7 +25,7 @@ export default function ModalAddRule({ refetchRules }) {
   ];
   const handleSubmit = async () => {
     try {
-      const res = await handleFetchApi(`role`, {
+      const res = await handleFetchApi(`rules`, {
         method: "POST",
         body: JSON.stringify(rule),
       });

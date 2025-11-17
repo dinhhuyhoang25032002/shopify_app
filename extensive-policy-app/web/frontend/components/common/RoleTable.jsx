@@ -155,7 +155,7 @@ export default memo(function RoleTable({
       try {
         setLoadingSearch(true);
         const result = await handleFetchApi(
-          `roles/search?name=${debouncedValue}`
+          `rules/search?name=${debouncedValue}`
         );
         setSearchData(result);
       } catch (error) {
@@ -174,7 +174,7 @@ export default memo(function RoleTable({
 
   const handleDuplicateRule = async (id) => {
     try {
-      await handleFetchApi(`/role/${id}`, { method: "POST" });
+      await handleFetchApi(`/rules/${id}`, { method: "POST" });
     } catch (error) {
       throw error;
     } finally {
@@ -185,7 +185,7 @@ export default memo(function RoleTable({
 
   const handleDeleteRule = async (id) => {
     try {
-      await handleFetchApi(`/role/${id}`, { method: "DELETE" });
+      await handleFetchApi(`/rules/${id}`, { method: "DELETE" });
     } catch (error) {
       throw error;
     } finally {
@@ -359,7 +359,10 @@ export default memo(function RoleTable({
           onNext={() => setIndex((p) => p + 1)}
           onPrevious={() => setIndex((p) => Math.max(p - 1, 0))}
           total={total}
-          type={"rules"}
+          pageSize={LIMIT}
+          disableNext={(index + 1) * LIMIT >= total}
+          disablePrev={index === 0}
+          type={"Rules"}
         />
       )}
       <ModalAddRule refetchRules={refetchRules} />

@@ -1,4 +1,4 @@
-import { STATUS_SHOP } from '@/constants';
+import { STATUS_SHOP } from 'src/constants';
 import { IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 export class ShopDto {
   @IsInt()

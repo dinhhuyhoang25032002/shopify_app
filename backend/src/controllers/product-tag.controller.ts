@@ -1,4 +1,4 @@
-import { handleGetProductTag } from '@/services/product_tag.service';
+import { handleGetProductTag } from 'src/services/product_tag.service';
 import { Context } from 'koa';
 
 export const getProductTag = async (ctx: Context) => {

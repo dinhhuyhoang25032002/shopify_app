@@ -14,7 +14,7 @@ import {
 import { NoteIcon } from "@shopify/polaris-icons";
 import { useQuery } from "react-query";
 import { useFetchApi } from "../../hooks/useFetchApi";
-import { DISCOUNT_TYPE, STATUS_ROLES } from "../../const";
+import { DISCOUNT_TYPE, LIMIT, STATUS_ROLES } from "../../const";
 import { memo, useState } from "react";
 import PaginationTable from "./PaginationTable";
 
@@ -28,16 +28,32 @@ export default memo(function ProductionList({
   activeTags?.forEach((tag) => params.append("tag", tag));
   const { handleFetchApi } = useFetchApi();
   const [index, setIndex] = useState(0);
+  const [cursorStack, setCursorStack] = useState([]);
+  const currentCursor = cursorStack[cursorStack.length - 1] ?? null;
+
   const { data, isLoading } = useQuery({
-    queryKey: ["products", activeTags],
-    queryFn: async () => handleFetchApi(`products?${params.toString()}`),
+    queryKey: ["products", activeTags, currentCursor],
+    queryFn: async () => {
+      const last = currentCursor || undefined;
+      const query = `products?${params.toString()}${
+        last ? `&last=${last}` : ""
+      }`;
+      return handleFetchApi(query);
+    },
   });
 
-  const {
-    data: productCount,
-    refetch: refetchProductCount,
-    isLoading: isLoadingCount,
-  } = useQuery({
+  // const { data, isLoading } = useQuery({
+  //   queryKey: ["products", activeTags, index],
+  //   queryFn: async () => {
+  //     const lastId = index > 0 ? data.pageInfo.endCursor : undefined;
+  //     const query = `products?${params.toString()}${
+  //       lastId ? `&last=${lastId}` : ""
+  //     }`;
+  //     return handleFetchApi(query);
+  //   },
+  // });
+
+  const { data: productCount, isLoading: isLoadingCount } = useQuery({
     queryKey: ["productCount"],
     queryFn: async () => {
       const response = await fetch("/api/products/count");
@@ -49,7 +65,7 @@ export default memo(function ProductionList({
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
     useIndexResourceState(data ?? []);
-  const rowMarkup = data?.map(({ id, title, image, price }, index) => {
+  const rowMarkup = data?.items.map(({ id, title, image, price }, index) => {
     // ✅ Compute modified price
     let modifiedPrice = price;
     if (status === STATUS_ROLES.ENABLE) {
@@ -126,7 +142,7 @@ export default memo(function ProductionList({
   return (
     <>
       <IndexTable
-        itemCount={isLoading ? 1 : data.length}
+        itemCount={isLoading ? 1 : data.items.length}
         selectable={false}
         selectedItemsCount={
           isLoading
@@ -139,7 +155,6 @@ export default memo(function ProductionList({
         headings={[
           { title: "ID" },
           { title: "Image" },
-
           { title: "Title" },
           { title: "Original Price" },
           { title: "Modified Price" },
@@ -167,6 +182,17 @@ export default memo(function ProductionList({
       {!isLoadingCount && (
         <PaginationTable
           index={index}
+          onNext={() => {
+            if (data.pageInfo?.hasNextPage) {
+              setCursorStack((prev) => [...prev, data.pageInfo.endCursor]);
+            }
+          }}
+          onPrevious={() => {
+            setCursorStack((prev) => prev.slice(0, -1));
+          }}
+          disableNext={!data?.pageInfo?.hasNextPage}
+          disablePrev={cursorStack.length === 0}
+          pageSize={LIMIT}
           type={"products"}
           total={productCount?.count}
         />

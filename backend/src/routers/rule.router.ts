@@ -5,28 +5,28 @@ import {
   getRule,
   getRules,
   getRulesBySearch,
-  updateRule,
-} from '@/controllers/rule.controller';
-import { RuleDto } from '@/dto/rule.dto';
-import { validateBody } from '@/middleware/validate-payload';
-import Router from '@koa/router';
+  updateRule
+} from 'src/controllers/rule.controller'
+import { RuleDto } from 'src/dto/rule.dto'
+import { validateBody } from 'src/middleware/validate-payload'
+import Router from '@koa/router'
 const router = new Router({
-  prefix: '/rules',
-});
+  prefix: '/rules'
+})
 
 // POST
-router.post('/', validateBody(RuleDto), createRule);
-router.post('/:id', duplicateRule);
+router.post('/', createRule)
+router.post('/:id', duplicateRule)
 
 // GET
-router.get('/search', getRulesBySearch);
-router.get('/:id', getRule);
-router.get('/', getRules);
+router.get('/search', getRulesBySearch)
+router.get('/:id', getRule)
+router.get('/', getRules)
 
 // PATCH
-router.patch('/:id', updateRule);
+router.patch('/:id', updateRule)
 
 //DELETE
-router.delete('/:id', deleteRule);
+router.delete('/:id', deleteRule)
 
-export default router;
+export default router

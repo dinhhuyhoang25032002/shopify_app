@@ -1,5 +1,5 @@
-import { ShopDto } from '@/dto/shop.dto.js';
-import { ShopModel } from '@/models/shop.model';
+import { ShopDto } from 'src/dto/shop.dto.js';
+import { ShopModel } from 'src/models/shop.model';
 import { Context } from 'koa';
 
 export const handleUpdateShopInfo = async (shopId: string, body: Partial<ShopDto>): Promise<boolean> => {

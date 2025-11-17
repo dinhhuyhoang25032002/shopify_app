@@ -1,4 +1,4 @@
-import ShopModel from '@/models/shop.model';
+import ShopModel from '../models/shop.model.js';
 import shopify from '../shopify.js';
 export const addNewShop = async (_req, res, next) => {
 

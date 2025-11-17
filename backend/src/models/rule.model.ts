@@ -1,7 +1,7 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '@/database/index';
-import { APPLY_TYPE, DISCOUNT_TYPE, STATUS_ROLES } from '@/constants';
-import { RuleDto } from '@/dto/rule.dto';
+import sequelize from 'src/database/index';
+import { APPLY_TYPE, DISCOUNT_TYPE, STATUS_ROLES } from 'src/constants';
+import { RuleDto } from 'src/dto/rule.dto';
 
 export interface RuleCreationAttributes extends Omit<RuleDto, 'id'> {}
 export class RuleModel extends Model<RuleDto, RuleCreationAttributes> implements RuleDto {

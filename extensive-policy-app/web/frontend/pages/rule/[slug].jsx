@@ -25,7 +25,7 @@ export default function EditRule() {
   const { handleFetchApi } = useFetchApi();
   const { isLoading, data, error, refetch } = useQuery({
     queryKey: ["rule", slug],
-    queryFn: () => handleFetchApi(`roles/${slug}`),
+    queryFn: () => handleFetchApi(`rules/${slug}`),
     refetchOnWindowFocus: false,
   });
   const [statusValue, setStatusValue] = useState(STATUS_ROLES.ENABLE);
@@ -45,7 +45,7 @@ export default function EditRule() {
   console.log("data", applyType);
   const handleSubmit = async () => {
     try {
-      await handleFetchApi(`roles/${slug}`, {
+      await handleFetchApi(`rules/${slug}`, {
         method: "PATCH",
         body: JSON.stringify({
           status: statusValue,

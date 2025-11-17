@@ -1,5 +1,5 @@
-import { RuleDto } from '@/dto/rule.dto';
-import { RuleModel } from '@/models/rule.model';
+import { RuleDto } from 'src/dto/rule.dto';
+import { RuleModel } from 'src/models/rule.model';
 import { Op } from 'sequelize';
 export const handleCreateRule = async (body: RuleDto): Promise<RuleDto> => {
   try {

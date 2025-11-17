@@ -1,6 +1,6 @@
 import { DataTypes, Model } from 'sequelize';
-import sequelize from '@/database/index';
-import { ShopDto } from '@/dto/shop.dto';
+import sequelize from 'src/database/index';
+import { ShopDto } from 'src/dto/shop.dto';
 
 export interface ShopCreationAttributes extends Omit<ShopDto, 'id'> {}
 export class ShopModel extends Model<ShopDto, ShopCreationAttributes> implements ShopDto {

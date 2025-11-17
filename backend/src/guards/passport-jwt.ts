@@ -1,6 +1,6 @@
 import passport from 'koa-passport';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
-import { ShopModel } from '@/models/shop.model';
+import { ShopModel } from 'src/models/shop.model';
 import dotenv from 'dotenv';
 dotenv.config();
 const opts = {
@@ -17,7 +17,7 @@ passport.use(
         where: { shop: domain },
         raw: true,
       });
-       const version = '2025-07';
+      const version = '2025-07';
       // 🔹 Nếu bạn có DB user:
       // const user = await User.findByPk(jwt_payload.id);
       if (shop) {

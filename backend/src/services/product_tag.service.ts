@@ -1,4 +1,4 @@
-import { handleFetchApi } from '@/util/handleFetchApi';
+import { handleFetchApi } from 'src/util/handleFetchApi';
 
 export const handleGetProductTag = async (user: any): Promise<string[]> => {
   const query = {

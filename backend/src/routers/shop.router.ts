@@ -1,5 +1,5 @@
 import Router from '@koa/router';
-import { getShopInfo, createShop, updateShopInfo, deleteShop } from '@/controllers/shop.controller';
+import { getShopInfo, createShop, updateShopInfo, deleteShop } from 'src/controllers/shop.controller';
 const router = new Router({
   prefix: '/shop',
 });

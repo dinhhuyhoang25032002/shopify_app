@@ -1,5 +1,5 @@
-import { getProducts } from '@/controllers/product.controller';
 import Router from '@koa/router';
+import { getProducts } from 'src/controllers/product.controller';
 const router = new Router({
   prefix: '/products',
 });

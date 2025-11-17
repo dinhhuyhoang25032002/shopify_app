@@ -1,5 +1,5 @@
-import { ShopDto } from '@/dto/shop.dto';
-import { deleteShopById, handleCreateShop, handleUpdateShopInfo } from '@/services/shop.service';
+import { ShopDto } from 'src/dto/shop.dto';
+import { deleteShopById, handleCreateShop, handleUpdateShopInfo } from 'src/services/shop.service';
 import { Context } from 'koa';
 export const getShopInfo = (ctx: Context) => {
   try {

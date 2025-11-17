@@ -1,4 +1,4 @@
-import { RuleDto } from '@/dto/rule.dto';
+import { RuleDto } from 'src/dto/rule.dto';
 import {
   handleDeleteRuleById,
   handleGetRuleByName,
@@ -7,7 +7,7 @@ import {
   handleGetRules,
   handleUpdateRuleById,
   handleGetRulesBySearch,
-} from '@/services/rule.service';
+} from 'src/services/rule.service';
 import { Context } from 'koa';
 export const createRule = async (ctx: Context) => {
   try {
