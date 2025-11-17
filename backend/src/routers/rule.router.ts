@@ -5,8 +5,9 @@ import {
   getRule,
   getRules,
   getRulesBySearch,
+  getRulesByTags,
   updateRule
-} from 'src/controllers/rule.controller'
+} from '@/controllers/rule.controller'
 import { RuleDto } from 'src/dto/rule.dto'
 import { validateBody } from '@/middleware/validatePayload'
 import Router from '@koa/router'
@@ -20,6 +21,7 @@ router.post('/:id', duplicateRule)
 
 // GET
 router.get('/search', getRulesBySearch)
+router.get('/tags', getRulesByTags)
 router.get('/:id', getRule)
 router.get('/', getRules)
 

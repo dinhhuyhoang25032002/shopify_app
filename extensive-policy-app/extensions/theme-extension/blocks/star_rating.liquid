@@ -9,7 +9,7 @@
 {% endif %}
 
 <script src="{{'hello.js' | asset_url}}" defer></script>
-<div>{{product.gift_card}}</div>
+<div id="product-tag">{{product.tags| json}}</div>
 {% schema %}
 {
   "name": "Star Rating",

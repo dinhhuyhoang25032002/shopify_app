@@ -3,14 +3,14 @@ import koaBody from 'koa-body'
 import Router from '@koa/router'
 import cors from '@koa/cors'
 import passport from './guards/passportJwt'
- import 'src/models/index';
+import 'src/models/index'
 import { generateToken } from '@/util/generateJwt'
 import shopRouter from 'src/routers/shop.router'
 import ruleRouter from 'src/routers/rule.router'
 import productRouter from 'src/routers/product.router'
 
-
 import sequelize from 'src/database/index'
+import { authGuard } from './middleware/ignoreRouter'
 const app = new Koa()
 const router = new Router({
   prefix: '/api'
@@ -22,15 +22,9 @@ app.use(
     credentials: true
   })
 )
-app.use(
-  koaBody({
-    multipart: true,
-    json: true,
-    urlencoded: true
-  })
-)
+app.use(koaBody())
 app.use(passport.initialize())
-app.use(passport.authenticate('jwt', { session: false }))
+app.use(authGuard)
 
 //SHOP ROUTERS
 router.use(shopRouter.routes()).use(shopRouter.allowedMethods())
@@ -51,5 +45,6 @@ app.use(router.routes()).use(router.allowedMethods())
     console.error('Unable to connect to the database:', error)
   }
 })()
+console.log(generateToken())
 
 app.listen(4000, () => console.log('Server running on port 4000'))

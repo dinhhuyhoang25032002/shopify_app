@@ -1,13 +1,16 @@
-import ShopModel from '../models/shop.model.js';
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 import shopify from '../shopify.js';
-export const addNewShop = async (_req, res, next) => {
+dotenv.config();
 
-  try {
-    const session = res.locals.shopify.session;
-    const client = new shopify.api.clients.Graphql({ session });
-    const data = await client.query({
-      data: {
-        "query": `
+export const afterAuth = async (_req, res, next) => {
+  const SECRET_KEY = process.env.SHOPIFY_API_SECRET || "super-secret-key";
+  const session = res.locals.shopify.session;
+  const client = new shopify.api.clients.Graphql({ session });
+
+  const data = await client.query({
+    data: {
+      "query": `
           query shopAccountOwner {
             shop {
               myshopifyDomain
@@ -21,33 +24,32 @@ export const addNewShop = async (_req, res, next) => {
             }
           }
         `
-      },
-    });
-    console.log('checkdata owner store', data.body.data.shop, { depth: null });
-    const shopData = await ShopModel.findOne({
-      where: {
+    },
+  });
+
+  const payload = {
+    email: data.body.data.shop.email,
+    sender_email: data.body.data.shop.email,
+    shop: session.shop,
+    first_name: data.body.data.shop.name,
+  }
+  const jwtToken = jwt.sign(payload, SECRET_KEY, { expiresIn: "1d" });
+  try {
+    await fetch(`https://untenuous-li-frothily.ngrok-free.dev/api/shop`, {
+      method: "POST",
+      body: JSON.stringify({
+        token: session.accessToken,
+        email: data.body.data.shop.email,
+        sender_email: data.body.data.shop.email,
         shop: session.shop,
+        first_name: data.body.data.shop.name,
+      }),
+      headers: {
+        'Authorization': `Bearer ${jwtToken}`,
+        'ngrok-skip-browser-warning': 'true',
+        'Content-Type': 'application/json'
       }
     })
-    if (!shopData) {
-      await ShopModel.create({
-        token: session.accessToken,
-        email: data.body.data.shop.email,
-        sender_email: data.body.data.shop.email,
-        shop: session.shop,
-        first_name: data.body.data.shop.name,
-      });
-    } else {
-      await shopData.update({
-        token: session.accessToken,
-        email: data.body.data.shop.email,
-        sender_email: data.body.data.shop.email,
-        shop: session.shop,
-        first_name: data.body.data.shop.name,
-      })
-    }
-
-    // Lưu thông tin shop vào DB (sau này)
     next(); // chuyển sang middleware tiếp theo (redirectToShopifyOrAppRoot)
   } catch (err) {
     console.error("❌ Error saving shop:", err);

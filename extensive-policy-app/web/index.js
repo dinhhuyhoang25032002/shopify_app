@@ -6,7 +6,7 @@ import serveStatic from "serve-static";
 import shopify from "./shopify.js";
 import productCreator from "./product-creator.js";
 import PrivacyWebhookHandlers from "./privacy.js";
-import { addNewShop } from "./services/shop.services.js";
+import { afterAuth } from "./services/shop.services.js";
 import sequelize from "./db.js";
 const PORT = parseInt(
   process.env.BACKEND_PORT || process.env.PORT || "61049",
@@ -25,7 +25,7 @@ app.get(shopify.config.auth.path, shopify.auth.begin());
 app.get(
   shopify.config.auth.callbackPath,
   shopify.auth.callback(),
-  addNewShop,
+  afterAuth,
   shopify.redirectToShopifyOrAppRoot()
 );
 app.post(
@@ -86,7 +86,7 @@ app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
 (async () => {
   try {
     await sequelize.authenticate();
-   // await sequelize.sync({ alter: true });
+    // await sequelize.sync({ alter: true });
     console.log('Connection has been established successfully.');
   } catch (error) {
     console.error('Unable to connect to the database:', error);

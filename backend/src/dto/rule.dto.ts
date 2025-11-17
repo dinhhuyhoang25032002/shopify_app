@@ -1,30 +1,30 @@
-import { IsInt, IsJSON, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsInt, IsJSON, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 export class RuleDto {
   @IsInt()
   @IsOptional()
-  id: number;
+  id: number
 
   @IsNotEmpty()
   @IsString()
-  name: string;
+  name: string
 
   @IsString()
   @IsNotEmpty()
-  status: string;
+  status: string
 
   @IsInt()
   @IsOptional()
-  priority: number;
+  priority: number
 
   @IsString()
   @IsNotEmpty()
-  apply: string;
+  apply: string
 
   @IsString()
   @IsNotEmpty()
-  type: string;
+  type: string
 
   @IsJSON()
   @IsOptional()
-  tags?: object;
+  tags?: string[] | string
 }
