@@ -1,7 +1,7 @@
 export const STATUS_ROLES = {
-    ENABLE: 'Enable',
-    DISABLE: 'Disable',
-}
+    ENABLE: 'ENABLE',
+    DISABLE: 'DISABLE',
+};
 
 export const LIMIT = 10
 

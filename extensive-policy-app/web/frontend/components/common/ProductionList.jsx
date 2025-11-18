@@ -40,7 +40,9 @@ export default memo(function ProductionList({
       }`;
       return handleFetchApi(query);
     },
+    // enabled: !!params.toString()|| ,
   });
+  console.log("ProductionList is here!", activeTags);
 
   // const { data, isLoading } = useQuery({
   //   queryKey: ["products", activeTags, index],
@@ -61,7 +63,6 @@ export default memo(function ProductionList({
     },
     refetchOnWindowFocus: false,
   });
-  console.log(discountType, value);
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
     useIndexResourceState(data ?? []);
@@ -142,7 +143,7 @@ export default memo(function ProductionList({
   return (
     <>
       <IndexTable
-        itemCount={isLoading ? 1 : data.items.length}
+        itemCount={isLoading ? 1 : data?.items.length}
         selectable={false}
         selectedItemsCount={
           isLoading

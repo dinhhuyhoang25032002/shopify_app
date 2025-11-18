@@ -11,7 +11,7 @@ import {
   InlineStack,
   Page,
 } from "@shopify/polaris";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import { APPLY_TYPE, DISCOUNT_TYPE, STATUS_ROLES } from "../../const";
 import ProductTag from "../../components/common/ProductTag";
 import ProductionList from "../../components/common/ProductionList";
@@ -42,7 +42,7 @@ export default function EditRule() {
   if (isLoading) return <SkeletonExample />;
   if (error) return <div>try again</div>;
   const { name, priority } = data;
-  console.log("data", applyType);
+
   const handleSubmit = async () => {
     try {
       await handleFetchApi(`rules/${slug}`, {
@@ -186,8 +186,8 @@ export default function EditRule() {
                     label={"Decrease the original price by a percentage (%)"}
                     //    helpText="Customers will only be able to check out as guests."
                     checked={discountType === DISCOUNT_TYPE.PERCENT}
-                    id="disabled"
-                    name="accounts"
+                    id={DISCOUNT_TYPE.PERCENT}
+                    name="discount"
                     onChange={() => setDiscountType(DISCOUNT_TYPE.PERCENT)}
                   />
                   <Divider />

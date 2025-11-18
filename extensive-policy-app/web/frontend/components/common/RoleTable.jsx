@@ -31,13 +31,14 @@ export default memo(function RoleTable({
 }) {
   const { handleFetchApi } = useFetchApi();
   const navigate = useNavigate();
-  const [sortSelected, setSortSelected] = useState(["id asc"]);
+  const [sortSelected, setSortSelected] = useState([""]);
   const shopify = useAppBridge();
   const [search, setSearch] = useState(null);
   const debouncedValue = useDebounce(search);
   const [searchData, setSearchData] = useState(null);
   const [isSearching, setSearching] = useState(false);
   const [isLoadingSearch, setLoadingSearch] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   let listRules;
   if (isSearching) {
     listRules = searchData ?? []; // searchData luôn là array
@@ -183,14 +184,13 @@ export default memo(function RoleTable({
     }
   };
 
-  const handleDeleteRule = async (id) => {
+  const handleDeleteRule = async (name) => {
     try {
-      await handleFetchApi(`/rules/${id}`, { method: "DELETE" });
-    } catch (error) {
-      throw error;
-    } finally {
+      await handleFetchApi(`/rules/${name}`, { method: "DELETE" });
       shopify.toast.show("Deleted Rule successfully.");
       await refetchRules();
+    } catch (error) {
+      throw error;
     }
   };
 
@@ -283,7 +283,7 @@ export default memo(function RoleTable({
         <Button
           icon={PlusIcon}
           variant="primary"
-          onClick={() => shopify.modal.show("my-modal")}
+          onClick={() => navigate("/rules/1")}
         >
           Add Rule
         </Button>

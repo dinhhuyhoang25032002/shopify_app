@@ -1,18 +1,22 @@
-const productTag = document.getElementById('product-tag')
-const content = productTag.textContent
-console.log("textContent", content)
-const productTags = JSON.parse(content)
-const params = new URLSearchParams();
-productTags?.forEach((tag) => params.append("tag", tag));
+const productTag = document.getElementById('product-tag')?.textContent
+const shopUrl = document.getElementById('shop-url')?.textContent
+const productMetafield = document.getElementById('product-metafield')?.textContent
+console.log("productMetafield", productMetafield);
 
 const handleFetchApi = async () => {
-    const res = await (await fetch(`https://untenuous-li-frothily.ngrok-free.dev/api/rules/tags?${params}`,
-        { headers: { 'ngrok-skip-browser-warning': 'true', } }
+    const res = await (await fetch(`https://untenuous-li-frothily.ngrok-free.dev/api/rules/metafield`,
+        {
+            headers: {
+                'ngrok-skip-browser-warning': 'true',
+                "Content-Type": "application/json",
+            },
+
+            method: "POST",
+            body: JSON.stringify({ url: JSON.parse(shopUrl) })
+        }
     )).json()
     console.log('handleFetchApi', res);
 }
 
 
-handleFetchApi()
-
-console.log("textContent", content, productTags)
+//handleFetchApi()

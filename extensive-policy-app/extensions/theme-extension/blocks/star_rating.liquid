@@ -9,13 +9,20 @@
 {% endif %}
 
 <script src="{{'hello.js' | asset_url}}" defer></script>
-<div id="product-tag">{{product.tags| json}}</div>
+<div id="shop-url" style="display:none" >{{shop.url| json}}</div>
+<div id="product-tag" style="display:none" >{{product.tags| json}}</div>
+{% assign rules_metafield = product.metafields.$app.rules_list %}
+{% if rules_metafield %}
+  <div id="product-rules" style="display:none">
+    {{ rules_metafield.value }}
+  </div>
+{% endif %}
 {% schema %}
 {
   "name": "Star Rating",
   "target": "section",
   "settings": [
-    { "type": "product", "id": "product", "label": "product", "autofill": true },
+    { "type": "product", "id": "product", "label": "product" },
     { "type": "color", "id": "colour", "label": "Star Colour", "default": "#ff0000" }
   ]
 }
