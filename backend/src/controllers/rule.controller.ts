@@ -7,7 +7,8 @@ import {
   handleGetRules,
   handleUpdateRuleById,
   handleGetRulesBySearch,
-  handleGetRulesByTags
+  handlePushMetafield
+  // handleGetRulesByTags
 } from 'src/services/rule.service'
 import { Context } from 'koa'
 export const createRule = async (ctx: Context) => {
@@ -73,7 +74,7 @@ export const getRule = async (ctx: Context) => {
 
     if (!rule) {
       ctx.status = 404
-      ctx.body = 'Rule not found.'
+      ctx.body = { message: 'Rule not found.' }
       return
     }
     ctx.status = 200
@@ -81,21 +82,17 @@ export const getRule = async (ctx: Context) => {
   } catch (error) {
     console.error(error)
     ctx.status = 500
-    ctx.body = 'Server error.'
   }
 }
 export const getRules = async (ctx: Context) => {
   try {
     const page = Number(ctx.query.index) || 0
-
     const data = await handleGetRules(page)
-
     ctx.status = 200
     ctx.body = data
   } catch (error) {
     console.error(error)
     ctx.status = 500
-    ctx.body = 'Error fetching rules'
   }
 }
 export const updateRule = async (ctx: Context) => {
@@ -125,31 +122,44 @@ export const deleteRule = async (ctx: Context) => {
 
     if (success) {
       ctx.status = 200
-      ctx.body = 'Rule deleted successfully'
+      ctx.body = { message: 'Rule deleted successfully' }
     } else {
       ctx.status = 404
-      ctx.body = 'Rule not found'
+      ctx.body = { message: 'Rule not found' }
     }
   } catch (error) {
     console.error(error)
     ctx.status = 500
-    ctx.body = 'Error deleting rule'
   }
 }
 
-export const getRulesByTags = async (ctx: Context) => {
+// export const getRulesByTags = async (ctx: Context) => {
+//   try {
+//     const tags = ctx.query.tag
+//     const result = await handleGetRulesByTags(tags)
+//     if (result) {
+//       ctx.status = 200
+//       ctx.body = { message: 'rule access.' }
+//       return
+//     }
+//     ctx.status = 200
+//     ctx.body = { message: 'rule not access.' }
+//   } catch (error) {
+//     ctx.status = 500
+//     console.log(error)
+//   }
+// }
+
+export const pushMetafield = async (ctx: Context) => {
   try {
-    const tags = ctx.query.tag
-    const result = await handleGetRulesByTags(tags)
-    if (result) {
-      ctx.status = 200
-      ctx.body = { message: 'rule access.' }
-      return
-    }
-    ctx.status = 200
-    ctx.body = { message: 'rule not access.' }
+    const body = ctx.request.body as { url: string }
+
+    const version = '2025-07'
+    const graphqlUrl = `${body.url}/admin/api/${version}/graphql.json`
+    const result = await handlePushMetafield(graphqlUrl)
   } catch (error) {
-    ctx.status = 500
     console.log(error)
+
+    ctx.status = 500
   }
 }

@@ -14,8 +14,8 @@ import {
 import { NoteIcon } from "@shopify/polaris-icons";
 import { useQuery } from "react-query";
 import { useFetchApi } from "../../hooks/useFetchApi";
-import { DISCOUNT_TYPE, LIMIT, STATUS_ROLES } from "../../const";
-import { memo, useState } from "react";
+import { DISCOUNT_TYPE, LIMIT, STATUS_RULES } from "../../const";
+import { memo, useEffect, useState } from "react";
 import PaginationTable from "./PaginationTable";
 
 export default memo(function ProductionList({
@@ -31,7 +31,7 @@ export default memo(function ProductionList({
   const [cursorStack, setCursorStack] = useState([]);
   const currentCursor = cursorStack[cursorStack.length - 1] ?? null;
 
-  const { data, isLoading } = useQuery({
+  const { data:productData, isLoading } = useQuery({
     queryKey: ["products", activeTags, currentCursor],
     queryFn: async () => {
       const last = currentCursor || undefined;
@@ -42,7 +42,7 @@ export default memo(function ProductionList({
     },
     // enabled: !!params.toString()|| ,
   });
-  console.log("ProductionList is here!", activeTags);
+  console.log("ProductionList is here!", value);
 
   // const { data, isLoading } = useQuery({
   //   queryKey: ["products", activeTags, index],
@@ -65,18 +65,23 @@ export default memo(function ProductionList({
   });
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
-    useIndexResourceState(data ?? []);
-  const rowMarkup = data?.items.map(({ id, title, image, price }, index) => {
+    useIndexResourceState(productData ?? []);
+  const rowMarkup = productData?.items.map(({ id, title, image, price }, index) => {
     // ✅ Compute modified price
     let modifiedPrice = price;
-    if (status === STATUS_ROLES.ENABLE) {
+    if (status === STATUS_RULES.ENABLE) {
       switch (discountType) {
         case DISCOUNT_TYPE.FIXED:
           modifiedPrice = price - value;
           break;
 
         case DISCOUNT_TYPE.PERCENT:
-          modifiedPrice = price - (price * value) / 100;
+          // Kiểm tra giá trị percent hợp lệ
+          if (value > 0 && value <= 100) {
+            modifiedPrice = price - (price * value) / 100;
+          } else {
+            modifiedPrice = "-"; // hoặc null
+          }
           break;
         case DISCOUNT_TYPE.SET_PRICE:
           modifiedPrice = value || price;
@@ -123,15 +128,18 @@ export default memo(function ProductionList({
         </IndexTable.Cell>
 
         <IndexTable.Cell>
-          <Text>${parseFloat(price).toFixed(2)}</Text>
+          <Text alignment="center">${parseFloat(price).toFixed(2)}</Text>
         </IndexTable.Cell>
 
         <IndexTable.Cell>
           <Text
-            tone={status === STATUS_ROLES.ENABLE ? "success" : "critical"}
-            fontWeight={status === STATUS_ROLES.ENABLE ? "bold" : "regular"}
+            alignment="center"
+            tone={status === STATUS_RULES.ENABLE ? "success" : "critical"}
+            fontWeight={status === STATUS_RULES.ENABLE ? "bold" : "regular"}
           >
-            ${parseFloat(modifiedPrice).toFixed(2)}
+            {modifiedPrice === "-"
+              ? "-"
+              : `$${parseFloat(modifiedPrice).toFixed(2)}`}
           </Text>
         </IndexTable.Cell>
       </IndexTable.Row>
@@ -143,7 +151,7 @@ export default memo(function ProductionList({
   return (
     <>
       <IndexTable
-        itemCount={isLoading ? 1 : data?.items.length}
+        itemCount={isLoading ? 1 : productData?.items.length}
         selectable={false}
         selectedItemsCount={
           isLoading
@@ -157,8 +165,8 @@ export default memo(function ProductionList({
           { title: "ID" },
           { title: "Image" },
           { title: "Title" },
-          { title: "Original Price" },
-          { title: "Modified Price" },
+          { title: "Original Price", alignment: "center" },
+          { title: "Modified Price", alignment: "center" },
         ]}
       >
         {isLoading ? (
@@ -184,14 +192,14 @@ export default memo(function ProductionList({
         <PaginationTable
           index={index}
           onNext={() => {
-            if (data.pageInfo?.hasNextPage) {
-              setCursorStack((prev) => [...prev, data.pageInfo.endCursor]);
+            if (productData.pageInfo?.hasNextPage) {
+              setCursorStack((prev) => [...prev, productData.pageInfo.endCursor]);
             }
           }}
           onPrevious={() => {
             setCursorStack((prev) => prev.slice(0, -1));
           }}
-          disableNext={!data?.pageInfo?.hasNextPage}
+          disableNext={!productData?.pageInfo?.hasNextPage}
           disablePrev={cursorStack.length === 0}
           pageSize={LIMIT}
           type={"products"}

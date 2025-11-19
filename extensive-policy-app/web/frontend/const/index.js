@@ -1,4 +1,4 @@
-export const STATUS_ROLES = {
+export const STATUS_RULES = {
     ENABLE: 'ENABLE',
     DISABLE: 'DISABLE',
 };
@@ -9,7 +9,7 @@ export const APPLY_TYPE = {
     ALL: 'ALL', TAGS: "TAGS"
 }
 export const DISCOUNT_TYPE = {
-    SET_PRICE: "PERCENTAGE",
+    SET_PRICE: "SET_PRICE",
     FIXED: "FIXED_AMOUNT",
     PERCENT: "PERCENTAGE"
 }

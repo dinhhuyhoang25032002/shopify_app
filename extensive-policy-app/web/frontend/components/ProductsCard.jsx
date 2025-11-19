@@ -11,7 +11,7 @@ export function ProductsCard() {
   const productsCount = 5;
 
   const {
-    data,
+    data: dataProductsCount,
     refetch: refetchProductCount,
     isLoading: isLoadingCount,
   } = useQuery({
@@ -64,7 +64,7 @@ export function ProductsCard() {
         <Text as="h4" variant="headingMd">
           {t("ProductsCard.totalProductsHeading")}
           <Text variant="bodyMd" as="p" fontWeight="semibold">
-            {isLoadingCount ? "-" : data?.count}
+            {isLoadingCount ? "-" : dataProductsCount?.count}
           </Text>
         </Text>
       </Text>

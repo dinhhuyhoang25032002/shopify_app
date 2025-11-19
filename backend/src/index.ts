@@ -45,6 +45,6 @@ app.use(router.routes()).use(router.allowedMethods())
     console.error('Unable to connect to the database:', error)
   }
 })()
-console.log(generateToken())
+console.log(generateToken());
 
 app.listen(4000, () => console.log('Server running on port 4000'))

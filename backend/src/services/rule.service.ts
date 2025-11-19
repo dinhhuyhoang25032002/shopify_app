@@ -1,6 +1,9 @@
 import { RuleDto } from 'src/dto/rule.dto'
 import { RuleModel } from 'src/models/rule.model'
+import util from 'util'
 import { Op } from 'sequelize'
+import { handleFetchApi } from '@/util/handleFetchApi'
+import { ShopModel } from '@/models/shop.model'
 export const handleCreateRule = async (body: RuleDto): Promise<RuleDto> => {
   try {
     return RuleModel.create(body, { raw: true })
@@ -38,7 +41,7 @@ export const handleUpdateRuleById = async (ruleId: string, body: Partial<RuleDto
 
 export const handleDeleteRuleById = async (ruleId: string): Promise<boolean> => {
   const result = await RuleModel.destroy({
-    where: { id: ruleId }
+    where: { name: ruleId }
   })
 
   return result > 0 // true nếu xóa được, false nếu không tìm thấy
@@ -62,7 +65,8 @@ export const handleGetRules = async (page = 0, pageSize = 10) => {
     RuleModel.findAll({
       raw: true,
       limit: pageSize,
-      offset: page * pageSize
+      offset: page * pageSize,
+      order: [['createdAt', 'DESC']]
     }),
     RuleModel.count()
   ])
@@ -71,29 +75,65 @@ export const handleGetRules = async (page = 0, pageSize = 10) => {
 }
 
 export const handleGetRuleByName = async (name: string) => {
-  if (!name) return null
-
   const rule = await RuleModel.findOne({
     where: { name },
-    raw: true // trả về plain object
-  })
-
-  return rule
-}
-
-export const handleGetRulesByTags = async (tags: string | string[] | undefined) => {
-  if (!tags) return []
-
-  const tagArray = Array.isArray(tags) ? tags : [tags]
-  console.log('tagArray', tagArray)
-
-  const rules = await RuleModel.findAll({
-    where: {
-      [Op.or]: tagArray.map((tag) => ({
-        tags: { [Op.like]: `%${tag}%` } // dùng LIKE tìm trong JSON text
-      }))
-    },
     raw: true
   })
-  return rules.length > 0
+
+  let ruleParse
+  if (rule) {
+    ruleParse = { ...rule, tags: rule.tags ? JSON.parse(rule.tags) : [] }
+  }
+
+  return ruleParse
+}
+
+// export const handleGetRulesByTags = async (tags: string | string[] | undefined) => {
+//   if (!tags) return []
+
+//   const tagArray = Array.isArray(tags) ? tags : [tags]
+//   console.log('tagArray', tagArray)
+
+//   const rules = await RuleModel.findAll({
+//     where: {
+//       [Op.or]: tagArray.map((tag) => ({
+//         tags: { [Op.like]: `%${tag}%` } // dùng LIKE tìm trong JSON text
+//       }))
+//     },
+//     raw: true
+//   })
+//   return rules.length > 0
+// }
+
+export const handlePushMetafield = async (url: string) => {
+  const domain = new URL(url).hostname
+
+  const [shop, rules] = await Promise.all([
+    ShopModel.findOne({ where: { shop: domain }, raw: true }),
+    RuleModel.findAll({ raw: true })
+  ])
+
+  const rulesList = rules.map((r) => ({
+    id: r.id,
+    name: r.name,
+    status: r.status,
+    apply: r.apply,
+    type: r.type,
+    priority: r.priority,
+    tags: r.tags ? JSON.parse(r.tags as string) : []
+  }))
+
+  const value = JSON.stringify(rulesList)
+
+  const query = {
+    query: `query {
+  currentAppInstallation {
+    id
+  }
+}`
+  }
+
+  const res = await handleFetchApi({ url, shop }, query)
+
+  console.log(util.inspect(res, false, null, true /* enable colors */))
 }

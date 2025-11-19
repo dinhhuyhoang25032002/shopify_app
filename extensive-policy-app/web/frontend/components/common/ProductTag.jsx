@@ -5,7 +5,6 @@ import {
   Icon,
   Tag,
   TextField,
-  LegacyStack,
   BlockStack,
   Badge,
   InlineStack,
@@ -15,16 +14,13 @@ import { useState, useCallback, memo } from "react";
 import { useFetchApi } from "../../hooks/useFetchApi";
 import { useQuery } from "react-query";
 import { APPLY_TYPE } from "../../const";
+import SkeletonExample from "../layout/SkeletonPage";
 
-export default memo(function ProductTag({
-  activeTags,
-  setActiveTags,
-  applyType,
-}) {
+export default memo(function ProductTag({ activeTags, setRule, apply }) {
   const [popoverActive, setPopoverActive] = useState(false);
-  console.log("ProductTag is here!");
+  console.log("ProductTag is here!", activeTags);
   const { handleFetchApi } = useFetchApi();
-  const { data, isLoading } = useQuery({
+  const { data: productTags, isLoading } = useQuery({
     queryKey: ["product-tag"],
     queryFn: async () => handleFetchApi(`products/tags`),
   });
@@ -33,27 +29,25 @@ export default memo(function ProductTag({
     []
   );
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <SkeletonExample />;
 
   const handleSelect = (item) => {
-    setActiveTags(
-      (prev) =>
-        prev.includes(item)
-          ? prev.filter((v) => v !== item) // nếu có rồi thì bỏ chọn
-          : [...prev, item] // nếu chưa có thì thêm vào
+    setRule((prevTags) =>
+      prevTags.includes(item)
+        ? prevTags.filter((v) => v !== item)
+        : [...prevTags, item]
     );
   };
-
   const activator = (
     <Button
       onClick={togglePopoverActive}
       disclosure
-      disabled={applyType === APPLY_TYPE.ALL ? true : false}
+      disabled={apply === APPLY_TYPE.ALL ? true : false}
     >
       Product Tags {activeTags.length ? `(${activeTags.length})` : ""}
     </Button>
   );
-  
+
   const verticalContentMarkup =
     activeTags.length > 0 ? (
       <InlineStack gap="200" spacing="extraTight">
@@ -66,7 +60,6 @@ export default memo(function ProductTag({
     ) : null;
   return (
     <>
-      {" "}
       <TextField
         label=""
         // value={textFieldValue}
@@ -80,11 +73,12 @@ export default memo(function ProductTag({
           active={popoverActive}
           activator={activator}
           // autofocusTarget="first-node"
+          zIndexOverride={900}
           onClose={togglePopoverActive}
         >
           <ActionList
             actionRole="menuitem"
-            items={data.map((item) => ({
+            items={productTags.map((item) => ({
               content: item,
               prefix: activeTags.includes(item) ? (
                 <Icon source={CheckIcon} />

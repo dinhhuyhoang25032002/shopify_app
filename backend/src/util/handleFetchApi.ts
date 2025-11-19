@@ -1,4 +1,4 @@
-export const handleFetchApi = async (user, query: { query: string }) => {
+export const handleFetchApi = async (user:any, query: { query: string }) => {
   try {
     const { shop, url } = user;
     const data = await (

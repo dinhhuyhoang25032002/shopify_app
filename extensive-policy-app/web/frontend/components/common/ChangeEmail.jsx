@@ -9,11 +9,8 @@ import { Dispatch, useState } from "react";
 import { useSelector } from "react-redux";
 import { useFetchApi } from "../../hooks/useFetchApi";
 import { useAppBridge } from "@shopify/app-bridge-react";
-type ChangeEmailProp = {
-  value: string;
-  setEditting: Dispatch<React.SetStateAction<boolean>>;
-};
-export default function ChangeEmail({ value, setEditting }: ChangeEmailProp) {
+
+export default function ChangeEmail({ value, setEditting }) {
   const [email, setEmail] = useState(value ?? "");
   const { shop } = useSelector((state) => state.shop);
   const shopify = useAppBridge();

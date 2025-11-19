@@ -12,7 +12,7 @@ import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
 import { useTranslation, Trans } from "react-i18next";
 import { trophyImage } from "../assets";
 import { ProductsCard } from "../components/ProductsCard";
-import RoleTable from "../components/common/RoleTable";
+import RuleTable from "../components/common/RuleTable";
 import { useState } from "react";
 import { useFetchApi } from "../hooks/useFetchApi";
 import { useQuery } from "react-query";
@@ -23,7 +23,7 @@ export default function RulePage() {
 
   const { handleFetchApi } = useFetchApi();
   const {
-    data,
+    data:rulesData,
     refetch: refetchRules,
     isLoading: isLoadingCount,
   } = useQuery({
@@ -43,13 +43,13 @@ export default function RulePage() {
       <TitleBar title={t("RulePage.title")} />
       <Layout>
         <Layout.Section>
-          <RoleTable
-            rules={data?.rules ?? []}
+          <RuleTable
+            rules={rulesData?.rules ?? []}
             isLoadingCount={isLoadingCount}
             refetchRules={refetchRules}
             index={index}
             setIndex={setIndex}
-            total={data?.total}
+            total={rulesData?.total}
           />
         </Layout.Section>
         {/* <Layout.Section>

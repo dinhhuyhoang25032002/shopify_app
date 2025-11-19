@@ -11,7 +11,7 @@ export class RuleModel extends Model<RuleDto, RuleCreationAttributes> implements
   declare priority: number
   declare apply: string
   declare type: string
-  declare tags: string[]
+  declare tags: string
 }
 RuleModel.init(
   {

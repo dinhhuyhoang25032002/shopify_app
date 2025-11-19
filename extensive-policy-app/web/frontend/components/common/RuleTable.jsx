@@ -10,7 +10,7 @@ import {
 import { formatDate } from "../../helper/formatDate";
 import { useState, useCallback, useEffect, memo } from "react";
 import { useFetchApi } from "../../hooks/useFetchApi";
-import { STATUS_ROLES, LIMIT } from "../../const";
+import { STATUS_RULES, LIMIT } from "../../const";
 import { useNavigate } from "react-router-dom";
 import { PlusIcon } from "@shopify/polaris-icons";
 import { Button } from "@shopify/polaris";
@@ -20,8 +20,9 @@ import { useDebounce } from "../../hooks/useDebounce";
 import { DuplicateIcon, EditIcon, DeleteIcon } from "@shopify/polaris-icons";
 import PaginationTable from "./PaginationTable";
 import ModalAddRule from "./ModalAddRule";
+import ModalConfirmDeleteRule from "./ModalConfirmDeleteRule";
 
-export default memo(function RoleTable({
+export default memo(function RuleTable({
   rules,
   isLoadingCount,
   refetchRules,
@@ -38,14 +39,14 @@ export default memo(function RoleTable({
   const [searchData, setSearchData] = useState(null);
   const [isSearching, setSearching] = useState(false);
   const [isLoadingSearch, setLoadingSearch] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [ruleDelete, setRuleDelete] = useState(null);
   let listRules;
   if (isSearching) {
     listRules = searchData ?? []; // searchData luôn là array
   } else {
     listRules = rules ?? []; // default từ useQuery
   }
-  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
   const [itemStrings, setItemStrings] = useState([]);
 
   useEffect(() => {
@@ -53,12 +54,6 @@ export default memo(function RoleTable({
       setItemStrings([`Show ${rules.length} of ${total} rules`]);
     }
   }, [rules, total]);
-  const deleteView = (index) => {
-    const newItemStrings = [...itemStrings];
-    newItemStrings.splice(index, 1);
-    setItemStrings(newItemStrings);
-    setSelected(0);
-  };
 
   switch (sortSelected[0]) {
     case "id asc":
@@ -77,66 +72,16 @@ export default memo(function RoleTable({
       listRules = [...listRules].sort((a, b) => b.priority - a.priority);
       break;
   }
-  const duplicateView = async (name) => {
-    setItemStrings([...itemStrings, name]);
-    setSelected(itemStrings.length);
-    await sleep(1);
-    return true;
-  };
 
   const tabs = itemStrings.map((item, index) => ({
     content: item,
     index,
-    onAction: () => {},
     id: `${item}-${index}`,
     isLocked: index === 0,
-    actions:
-      index === 0
-        ? []
-        : [
-            {
-              type: "rename",
-              onAction: () => {},
-              onPrimaryAction: async (value) => {
-                const newItemsStrings = tabs.map((item, idx) => {
-                  if (idx === index) {
-                    return value;
-                  }
-                  return item.content;
-                });
-                await sleep(1);
-                setItemStrings(newItemsStrings);
-                return true;
-              },
-            },
-            {
-              type: "duplicate",
-              onPrimaryAction: async (value) => {
-                await sleep(1);
-                duplicateView(value);
-                return true;
-              },
-            },
-            {
-              type: "edit",
-            },
-            {
-              type: "delete",
-              onPrimaryAction: async () => {
-                await sleep(1);
-                deleteView(index);
-                return true;
-              },
-            },
-          ],
   }));
   const [selected, setSelected] = useState(0);
 
   const sortOptions = [
-    // { label: 'Order', value: 'order asc', directionLabel: 'Ascending' },
-    // { label: 'Order', value: 'order desc', directionLabel: 'Descending' },
-    // { label: 'Customer', value: 'customer asc', directionLabel: 'A-Z' },
-    // { label: 'Customer', value: 'customer desc', directionLabel: 'Z-A' },
     { label: "ID", value: "id asc", directionLabel: "Ascending" },
     { label: "ID", value: "id desc", directionLabel: "Descending" },
     { label: "Priority", value: "priority asc", directionLabel: "Ascending" },
@@ -176,22 +121,16 @@ export default memo(function RoleTable({
   const handleDuplicateRule = async (id) => {
     try {
       await handleFetchApi(`/rules/${id}`, { method: "POST" });
-    } catch (error) {
-      throw error;
-    } finally {
       shopify.toast.show("Created Copy Rule.");
       await refetchRules();
+    } catch (error) {
+      throw error;
     }
   };
 
   const handleDeleteRule = async (name) => {
-    try {
-      await handleFetchApi(`/rules/${name}`, { method: "DELETE" });
-      shopify.toast.show("Deleted Rule successfully.");
-      await refetchRules();
-    } catch (error) {
-      throw error;
-    }
+    setRuleDelete(name);
+    shopify.modal.show("confirm-delete-modal");
   };
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
@@ -215,7 +154,7 @@ export default memo(function RoleTable({
         <IndexTable.Cell>
           <Text as="span" alignment="center">
             <Badge
-              tone={status === STATUS_ROLES.ENABLE ? "success" : "warning"}
+              tone={status === STATUS_RULES.ENABLE ? "success" : "warning"}
             >
               {status}
             </Badge>
@@ -244,7 +183,7 @@ export default memo(function RoleTable({
               disabled={allResourcesSelected}
               onClick={(e) => {
                 e.stopPropagation();
-                navigate(`/rule/${name}`);
+                navigate(`/rules/${name}`);
               }}
             />
             <Button
@@ -268,7 +207,6 @@ export default memo(function RoleTable({
       </IndexTable.Row>
     )
   );
-  console.log("ádasdsad");
 
   return (
     <Card>
@@ -283,7 +221,7 @@ export default memo(function RoleTable({
         <Button
           icon={PlusIcon}
           variant="primary"
-          onClick={() => navigate("/rules/1")}
+          onClick={() => shopify.modal.show("add-rule-modal")}
         >
           Add Rule
         </Button>
@@ -365,7 +303,11 @@ export default memo(function RoleTable({
           type={"Rules"}
         />
       )}
-      <ModalAddRule refetchRules={refetchRules} />
+      <ModalConfirmDeleteRule
+        refetchRules={refetchRules}
+        ruleDelete={ruleDelete}
+      />
+      <ModalAddRule />
     </Card>
   );
 });
