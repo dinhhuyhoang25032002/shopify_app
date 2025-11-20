@@ -20,7 +20,7 @@ export const handleCreateShop = async (body: ShopDto) => {
   if (!shopData) {
     return ShopModel.create(body, { raw: true })
   } else {
-    return shopData.update(body, { raw: true, returning: true })
+    return shopData.update({ status: 1 }, { raw: true, returning: true })
   }
 }
 

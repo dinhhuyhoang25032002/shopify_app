@@ -1,19 +1,19 @@
-import Router from '@koa/router';
-import { getShopInfo, createShop, updateShopInfo, deleteShop } from 'src/controllers/shop.controller';
+import Router from '@koa/router'
+import { getShopInfo, createShop, updateShopInfo, deleteShop } from 'src/controllers/shop.controller'
 const router = new Router({
-  prefix: '/shop',
-});
+  prefix: '/shop'
+})
 
 // GET
-router.get('/', getShopInfo);
+router.get('/', getShopInfo)
 
 //POST
-router.post('/', createShop);
+router.post('/', createShop)
 
 //PATCH
-router.patch('/:id', async ctx => updateShopInfo);
+router.patch('/:id', updateShopInfo)
 
 // DELETE
-router.delete('/:id', async ctx => deleteShop);
+router.delete('/:id', deleteShop)
 
-export default router;
+export default router

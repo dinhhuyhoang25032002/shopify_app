@@ -2,10 +2,28 @@ const productTag = JSON.parse(document.getElementById('product-tag')?.textConten
 const shopUrl = document.getElementById('shop-url')?.textContent
 const rulesData = JSON.parse(document.getElementById('rules-data')?.textContent ?? "")
 
-const filtered = array2.filter(item =>
-    Array.isArray(item.tag) && item.tag.some(t => array1.includes(t))
+const filtered = rulesData.filter(item =>
+    Array.isArray(item.tag) && item.tag.some(t => productTag.includes(t))
 );
-console.log("filtered", filtered);
+const discountSelect = document.getElementById('discount-select');
+discountSelect.innerHTML = "";
+if (filtered.length === 0) {
+    const option = document.createElement('option');
+    option.value = "";
+    option.textContent = "Không có discount";
+    discountSelect.appendChild(option);
+} else {
+    const defaultOption = document.createElement('option');
+    defaultOption.value = "";
+    defaultOption.textContent = "-- Chọn discount --";
+    discountSelect.appendChild(defaultOption);
+    filtered.forEach(rule => {
+        const option = document.createElement('option');
+        option.value = rule.name; // hoặc rule.id nếu có
+        option.textContent = rule.name;
+        discountSelect.appendChild(option);
+    });
+}
 const handleFetchApi = async () => {
     const res = await (await fetch(`https://untenuous-li-frothily.ngrok-free.dev/api/rules/metafield`,
         {

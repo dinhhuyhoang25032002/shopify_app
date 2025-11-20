@@ -11,6 +11,7 @@ export class RuleModel extends Model<RuleDto, RuleCreationAttributes> implements
   declare priority: number
   declare apply: string
   declare type: string
+  declare value: number
   declare tags: string
 }
 RuleModel.init(
@@ -41,6 +42,7 @@ RuleModel.init(
       type: DataTypes.ENUM(...Object.values(DISCOUNT_TYPE)),
       defaultValue: DISCOUNT_TYPE.SET_PRICE
     },
+    value: { type: DataTypes.NUMBER },
     tags: {
       type: DataTypes.TEXT
     }

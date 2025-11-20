@@ -100,6 +100,7 @@ export const handlePushMetafield = async (url: string) => {
     name: r.name,
     status: r.status,
     apply: r.apply,
+    value: r.value,
     type: r.type,
     priority: r.priority,
     tags: r.tags ? JSON.parse(r.tags as string) : []
@@ -109,14 +110,14 @@ export const handlePushMetafield = async (url: string) => {
 
   const query = {
     query: `query {
-   shop {
-      id
-    }
-}`
+        currentAppInstallation {
+        id
+      }
+    }`
   }
 
   const res = await handleFetchApi({ url, shop }, query)
-  const idShop = res.data.shop.id
+  const idApp = res.data.currentAppInstallation.id
   const queryPush = {
     query: `mutation CreateAppDataMetafield($metafieldsSetInput: [MetafieldsSetInput!]!) {
       metafieldsSet(metafields: $metafieldsSetInput) {
@@ -139,12 +140,12 @@ export const handlePushMetafield = async (url: string) => {
           key: 'product_rule',
           type: 'json',
           value: value,
-          ownerId: idShop
+          ownerId: idApp
         }
       ]
     }
   }
   const pushMetaData = await handleFetchApi({ url, shop }, queryPush)
-
+  console.log(util.inspect(pushMetaData, false, null, true /* enable colors */))
   return pushMetaData.data.metafieldsSet.metafields.length
 }

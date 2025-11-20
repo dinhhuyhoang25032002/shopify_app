@@ -7,17 +7,6 @@
   <img src="{{ "thumbs-up.png" | asset_img_url: '15x' }}" height="15" width="15" loading="lazy">
   {{ 'ratings.home.recommendationText' | t }}
 {% endif %}
-
-<script src="{{'hello.js' | asset_url}}" defer></script>
-<div id="shop-url" style="display:none">{{shop.url| json}}</div>
-{% assign productTag = product.tags| json %}
-<div id="product-tag" style="display:none" >{{productTag}}</div>
-{% assign rules = app.metafields.rule_list.product_rule | parse_json| parse_json%}
-<div id="rules-data" style="display:none">
-  {{ rules }}
-</div>
-
-
 {% schema %}
 {
   "name": "Star Rating",

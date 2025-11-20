@@ -8,9 +8,11 @@ import { generateToken } from '@/util/generateJwt'
 import shopRouter from 'src/routers/shop.router'
 import ruleRouter from 'src/routers/rule.router'
 import productRouter from 'src/routers/product.router'
-
+import webhookRouter from 'src/routers/webhook.router'
 import sequelize from 'src/database/index'
 import { authGuard } from './middleware/ignoreRouter'
+import { shopifyWebhookVerifier } from './middleware/verifyWebhook'
+
 const app = new Koa()
 const router = new Router({
   prefix: '/api'
@@ -22,7 +24,11 @@ app.use(
     credentials: true
   })
 )
-app.use(koaBody())
+// Middleware verify webhook đứng trước koa-body
+
+// Body parser cho các route không phải webhook
+app.use(koaBody({ json: true, includeUnparsed: true }))
+app.use(shopifyWebhookVerifier)
 app.use(passport.initialize())
 app.use(authGuard)
 
@@ -30,21 +36,23 @@ app.use(authGuard)
 router.use(shopRouter.routes()).use(shopRouter.allowedMethods())
 
 //RULE ROUTERS
-router.use(ruleRouter.routes()).use(shopRouter.allowedMethods())
+router.use(ruleRouter.routes()).use(ruleRouter.allowedMethods())
 
 //PRODUCT ROUTERS
-router.use(productRouter.routes()).use(shopRouter.allowedMethods())
+router.use(productRouter.routes()).use(productRouter.allowedMethods())
 
+// WEBHOOK ROUTERS
+router.use(webhookRouter.routes()).use(webhookRouter.allowedMethods())
 app.use(router.routes()).use(router.allowedMethods())
 ;(async () => {
   try {
     await sequelize.authenticate()
-   // await sequelize.sync({ alter: true })
+    // await sequelize.sync({ alter: true })
     console.log('Connection has been established successfully.')
   } catch (error) {
     console.error('Unable to connect to the database:', error)
   }
 })()
-console.log(generateToken());
+console.log(generateToken())
 
 app.listen(4000, () => console.log('Server running on port 4000'))

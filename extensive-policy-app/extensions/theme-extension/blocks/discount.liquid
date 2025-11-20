@@ -1,0 +1,22 @@
+<select id="discount-select">
+  <option value="">-- Chọn discount --</option>
+</select>
+<div id="shop-url" style="display:none">{{shop.url| json}}</div>
+{% assign productTag = product.tags| json %}
+<div id="product-tag" style="display:none" >{{productTag}}</div>
+{% assign rules = app.metafields.rule_list.product_rule | parse_json| parse_json%}
+<div id="rules-data" style="display:none">
+  {{ rules }}
+</div>
+<script src="{{'hello.js' | asset_url}}" defer></script>
+
+{% schema %}
+{
+  "name": "Discount Choose",
+  "target": "section",
+  "settings": [
+    { "type": "product", "id": "product", "label": "product" },
+    { "type": "color", "id": "colour", "label": "Star Colour", "default": "#ff0000" }
+  ]
+}
+{% endschema %}
