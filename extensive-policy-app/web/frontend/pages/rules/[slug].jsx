@@ -23,8 +23,6 @@ export default function EditRulePage() {
 
   const shopify = useAppBridge();
 
-  // Fill form with fetched API data
-
   const onSubmit = useCallback(async (formData) => {
     try {
       await handleFetchApi(`rules/${slug}`, {
@@ -38,7 +36,7 @@ export default function EditRulePage() {
       console.log(error);
     }
   }, []);
-  console.log("ruleInfo", ruleInfo);
+
   if (isLoading) return <SkeletonExample />;
   return (
     <Page>

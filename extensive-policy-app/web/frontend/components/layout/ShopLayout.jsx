@@ -9,11 +9,7 @@ export default function ShopLayout({ children }) {
   const dispatch = useDispatch();
   const { shop, loading } = useSelector((state) => state.shop);
   useEffect(() => {
-    console.log("shop", shop);
     if (!shop) {
-      console.log("Haven't Shop Information!");
-
-      // tránh gọi lại nhiều lần
       dispatch(fetchShopInfo(handleFetchApi));
     }
   }, [shop]);

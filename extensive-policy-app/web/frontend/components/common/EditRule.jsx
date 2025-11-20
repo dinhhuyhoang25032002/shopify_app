@@ -68,7 +68,6 @@ export default function EditRule({ ruleInfo, onSubmit, title, edit }) {
     },
     [setFormValue]
   );
-  console.log(type, value);
 
   return (
     <Box padding={400}>
@@ -267,7 +266,7 @@ export default function EditRule({ ruleInfo, onSubmit, title, edit }) {
               status={watch("status")}
               activeTags={tags}
               applyType={apply}
-              discountType={type[0]}
+              discountType={type}
               value={
                 type === DISCOUNT_TYPE.PERCENT
                   ? value > 0 && value <= 100

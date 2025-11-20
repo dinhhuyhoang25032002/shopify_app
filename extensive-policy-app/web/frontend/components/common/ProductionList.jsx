@@ -31,7 +31,7 @@ export default memo(function ProductionList({
   const [cursorStack, setCursorStack] = useState([]);
   const currentCursor = cursorStack[cursorStack.length - 1] ?? null;
 
-  const { data:productData, isLoading } = useQuery({
+  const { data: productData, isLoading } = useQuery({
     queryKey: ["products", activeTags, currentCursor],
     queryFn: async () => {
       const last = currentCursor || undefined;
@@ -40,20 +40,7 @@ export default memo(function ProductionList({
       }`;
       return handleFetchApi(query);
     },
-    // enabled: !!params.toString()|| ,
   });
-  console.log("ProductionList is here!", value);
-
-  // const { data, isLoading } = useQuery({
-  //   queryKey: ["products", activeTags, index],
-  //   queryFn: async () => {
-  //     const lastId = index > 0 ? data.pageInfo.endCursor : undefined;
-  //     const query = `products?${params.toString()}${
-  //       lastId ? `&last=${lastId}` : ""
-  //     }`;
-  //     return handleFetchApi(query);
-  //   },
-  // });
 
   const { data: productCount, isLoading: isLoadingCount } = useQuery({
     queryKey: ["productCount"],
@@ -66,85 +53,87 @@ export default memo(function ProductionList({
 
   const { selectedResources, allResourcesSelected, handleSelectionChange } =
     useIndexResourceState(productData ?? []);
-  const rowMarkup = productData?.items.map(({ id, title, image, price }, index) => {
-    // ✅ Compute modified price
-    let modifiedPrice = price;
-    if (status === STATUS_RULES.ENABLE) {
-      switch (discountType) {
-        case DISCOUNT_TYPE.FIXED:
-          modifiedPrice = price - value;
-          break;
+  const rowMarkup = productData?.items.map(
+    ({ id, title, image, price }, index) => {
+      // ✅ Compute modified price
+      let modifiedPrice = price;
+      if (status === STATUS_RULES.ENABLE) {
+        switch (discountType) {
+          case DISCOUNT_TYPE.FIXED:
+            modifiedPrice = price - value;
+            break;
 
-        case DISCOUNT_TYPE.PERCENT:
-          // Kiểm tra giá trị percent hợp lệ
-          if (value > 0 && value <= 100) {
-            modifiedPrice = price - (price * value) / 100;
-          } else {
-            modifiedPrice = "-"; // hoặc null
-          }
-          break;
-        case DISCOUNT_TYPE.SET_PRICE:
-          modifiedPrice = value || price;
-          break;
-        default:
-          modifiedPrice = price;
+          case DISCOUNT_TYPE.PERCENT:
+            // Kiểm tra giá trị percent hợp lệ
+            if (value > 0 && value <= 100) {
+              modifiedPrice = price - (price * value) / 100;
+            } else {
+              modifiedPrice = "-"; // hoặc null
+            }
+            break;
+          case DISCOUNT_TYPE.SET_PRICE:
+            modifiedPrice = value || price;
+            break;
+          default:
+            modifiedPrice = price;
+        }
       }
+
+      return (
+        <IndexTable.Row
+          id={id.split("/").pop()}
+          key={id.split("/").pop()}
+          selected={selectedResources.includes(id)}
+          position={index}
+        >
+          <IndexTable.Cell>
+            <Text as="span">{id.split("/").pop()}</Text>
+          </IndexTable.Cell>
+
+          <IndexTable.Cell>
+            {image ? (
+              <Image
+                width={80}
+                height={80}
+                source={image}
+                alt={title}
+                style={{
+                  width: 40,
+                  height: 40,
+                  objectFit: "cover",
+                  borderRadius: 4,
+                }}
+              />
+            ) : (
+              <Thumbnail source={NoteIcon} size="small" alt="Small document" />
+            )}
+          </IndexTable.Cell>
+
+          <IndexTable.Cell>
+            <Text as="span" fontWeight="bold">
+              {title}
+            </Text>
+          </IndexTable.Cell>
+
+          <IndexTable.Cell>
+            <Text alignment="center">${parseFloat(price).toFixed(2)}</Text>
+          </IndexTable.Cell>
+
+          <IndexTable.Cell>
+            <Text
+              alignment="center"
+              tone={status === STATUS_RULES.ENABLE ? "success" : "critical"}
+              fontWeight={status === STATUS_RULES.ENABLE ? "bold" : "regular"}
+            >
+              {modifiedPrice === "-"
+                ? "-"
+                : `$${parseFloat(modifiedPrice).toFixed(2)}`}
+            </Text>
+          </IndexTable.Cell>
+        </IndexTable.Row>
+      );
     }
-
-    return (
-      <IndexTable.Row
-        id={id.split("/").pop()}
-        key={id.split("/").pop()}
-        selected={selectedResources.includes(id)}
-        position={index}
-      >
-        <IndexTable.Cell>
-          <Text as="span">{id.split("/").pop()}</Text>
-        </IndexTable.Cell>
-
-        <IndexTable.Cell>
-          {image ? (
-            <Image
-              width={80}
-              height={80}
-              source={image}
-              alt={title}
-              style={{
-                width: 40,
-                height: 40,
-                objectFit: "cover",
-                borderRadius: 4,
-              }}
-            />
-          ) : (
-            <Thumbnail source={NoteIcon} size="small" alt="Small document" />
-          )}
-        </IndexTable.Cell>
-
-        <IndexTable.Cell>
-          <Text as="span" fontWeight="bold">
-            {title}
-          </Text>
-        </IndexTable.Cell>
-
-        <IndexTable.Cell>
-          <Text alignment="center">${parseFloat(price).toFixed(2)}</Text>
-        </IndexTable.Cell>
-
-        <IndexTable.Cell>
-          <Text
-            alignment="center"
-            tone={status === STATUS_RULES.ENABLE ? "success" : "critical"}
-            fontWeight={status === STATUS_RULES.ENABLE ? "bold" : "regular"}
-          >
-            {modifiedPrice === "-"
-              ? "-"
-              : `$${parseFloat(modifiedPrice).toFixed(2)}`}
-          </Text>
-        </IndexTable.Cell>
-      </IndexTable.Row>
-    );
-  });
+  );
 
   // if (isLoading) return <div>Loading...</div>;
 
@@ -193,7 +182,10 @@ export default memo(function ProductionList({
           index={index}
           onNext={() => {
             if (productData.pageInfo?.hasNextPage) {
-              setCursorStack((prev) => [...prev, productData.pageInfo.endCursor]);
+              setCursorStack((prev) => [
+                ...prev,
+                productData.pageInfo.endCursor,
+              ]);
             }
           }}
           onPrevious={() => {

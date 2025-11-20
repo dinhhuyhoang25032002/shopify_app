@@ -32,7 +32,6 @@ export const handleDuplicateRule = async (ruleId: string): Promise<RuleDto | nul
 
 export const handleUpdateRuleById = async (ruleId: string, body: Partial<RuleDto>): Promise<boolean> => {
   let tags = body.tags
-  console.log('tags', tags)
 
   const [affectedRows] = await RuleModel.update({ ...body, tags: JSON.stringify(tags) }, { where: { name: ruleId } })
 
@@ -88,23 +87,6 @@ export const handleGetRuleByName = async (name: string) => {
   return ruleParse
 }
 
-// export const handleGetRulesByTags = async (tags: string | string[] | undefined) => {
-//   if (!tags) return []
-
-//   const tagArray = Array.isArray(tags) ? tags : [tags]
-//   console.log('tagArray', tagArray)
-
-//   const rules = await RuleModel.findAll({
-//     where: {
-//       [Op.or]: tagArray.map((tag) => ({
-//         tags: { [Op.like]: `%${tag}%` } // dùng LIKE tìm trong JSON text
-//       }))
-//     },
-//     raw: true
-//   })
-//   return rules.length > 0
-// }
-
 export const handlePushMetafield = async (url: string) => {
   const domain = new URL(url).hostname
 
@@ -127,13 +109,42 @@ export const handlePushMetafield = async (url: string) => {
 
   const query = {
     query: `query {
-  currentAppInstallation {
-    id
-  }
+   shop {
+      id
+    }
 }`
   }
 
   const res = await handleFetchApi({ url, shop }, query)
+  const idShop = res.data.shop.id
+  const queryPush = {
+    query: `mutation CreateAppDataMetafield($metafieldsSetInput: [MetafieldsSetInput!]!) {
+      metafieldsSet(metafields: $metafieldsSetInput) {
+        metafields {
+          id
+          namespace
+          key
+          value
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,
+    variables: {
+      metafieldsSetInput: [
+        {
+          namespace: 'rule_list',
+          key: 'product_rule',
+          type: 'json',
+          value: value,
+          ownerId: idShop
+        }
+      ]
+    }
+  }
+  const pushMetaData = await handleFetchApi({ url, shop }, queryPush)
 
-  console.log(util.inspect(res, false, null, true /* enable colors */))
+  return pushMetaData.data.metafieldsSet.metafields.length
 }

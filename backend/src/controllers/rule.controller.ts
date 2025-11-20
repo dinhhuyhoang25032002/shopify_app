@@ -99,7 +99,6 @@ export const updateRule = async (ctx: Context) => {
   try {
     const ruleId = ctx.params.id
     const body = ctx.request.body as Partial<RuleDto>
-    console.log('body', body)
 
     const success = await handleUpdateRuleById(ruleId, body)
 
@@ -133,30 +132,16 @@ export const deleteRule = async (ctx: Context) => {
   }
 }
 
-// export const getRulesByTags = async (ctx: Context) => {
-//   try {
-//     const tags = ctx.query.tag
-//     const result = await handleGetRulesByTags(tags)
-//     if (result) {
-//       ctx.status = 200
-//       ctx.body = { message: 'rule access.' }
-//       return
-//     }
-//     ctx.status = 200
-//     ctx.body = { message: 'rule not access.' }
-//   } catch (error) {
-//     ctx.status = 500
-//     console.log(error)
-//   }
-// }
-
 export const pushMetafield = async (ctx: Context) => {
   try {
     const body = ctx.request.body as { url: string }
 
     const version = '2025-07'
     const graphqlUrl = `${body.url}/admin/api/${version}/graphql.json`
+
     const result = await handlePushMetafield(graphqlUrl)
+    ctx.status = 200
+    ctx.body = { result: result > 0 }
   } catch (error) {
     console.log(error)
 

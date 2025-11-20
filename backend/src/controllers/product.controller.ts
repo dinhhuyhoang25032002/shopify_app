@@ -7,7 +7,7 @@ export const getProducts = async (ctx: Context) => {
     const user = ctx.state.user
     const tags = ctx.query.tag
     const last = ctx.query.last
-    console.log('last', last)
+
 
     const products = await handleGetProducts(user, tags, last)
 

@@ -8,14 +8,7 @@ export default function PageName() {
   const { t } = useTranslation();
   return (
     <Page>
-      <TitleBar title={t("Products.title")}>
-        {/* <button variant="primary" onClick={() => console.log("Primary action")}>
-          {t("Products.primaryAction")}
-        </button>
-        <button onClick={() => console.log("Secondary action")}>
-          {t("Products.secondaryAction")}
-        </button> */}
-      </TitleBar>
+      <TitleBar title={t("Products.title")}></TitleBar>
       <Layout>
         <Layout.Section secondary>
           <ProductsCard />
