@@ -30,15 +30,12 @@ export default memo(function ProductTag({ activeTags, handleSetTags, apply }) {
   if (isLoading) return <SkeletonExample />;
 
   const handleSelect = (item) => {
-    setListTags(
-      (prevTags) =>
-        prevTags.includes(item)
-          ? prevTags.filter((v) => v !== item) // remove tag
-          : [...prevTags, item] // add tag
-    );
+    const updatedTags = listTags.includes(item)
+      ? listTags.filter((v) => v !== item)
+      : [...listTags, item];
+    setListTags(updatedTags);
+    handleSetTags(updatedTags);
     console.log("listTags", listTags);
-
-    handleSetTags(listTags);
   };
   const activator = (
     <Button

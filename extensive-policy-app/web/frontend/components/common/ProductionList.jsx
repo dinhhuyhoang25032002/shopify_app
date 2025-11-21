@@ -27,7 +27,7 @@ export default memo(function ProductionList({
   const params = new URLSearchParams();
   activeTags?.forEach((tag) => params.append("tag", tag));
   const { handleFetchApi } = useFetchApi();
-  const [index, setIndex] = useState(0);
+  //const [index, setIndex] = useState(0);
   const [cursorStack, setCursorStack] = useState([]);
   const currentCursor = cursorStack[cursorStack.length - 1] ?? null;
 
@@ -179,7 +179,7 @@ export default memo(function ProductionList({
       </IndexTable>
       {!isLoadingCount && (
         <PaginationTable
-          index={index}
+          //index={index}
           onNext={() => {
             if (productData.pageInfo?.hasNextPage) {
               setCursorStack((prev) => [
