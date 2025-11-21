@@ -3,6 +3,10 @@ const shopUrl = document.getElementById('shop-url')?.textContent;
 const rulesData = JSON.parse(document.getElementById('rules-data')?.textContent);
 const formatMoneyShop = document.getElementById('format-money-shop')?.textContent
 const currency = JSON.parse(document.getElementById('currency-money-shop')?.textContent)
+const priceElement = document.querySelector(
+    ".price-item.price-item--regular"
+);
+console.log("priceElement", priceElement);
 
 // Filter rule
 const filtered = rulesData.filter(item => {
@@ -44,7 +48,7 @@ const originalPrice = parseFloat(
 );
 console.log("formatMoneyShop", formatMoneyShop, originalPrice, currency);
 const formatMoney = (amount) => {
-    const characters = formatMoneyShop.trim().charAt(1)
+    const characters = formatMoneyShop.trim().match(/[^0-9,.\s]/)?.[1] || "$";
     const formatted = `${characters}${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })} ${currency}`;
     return formatted
 }
@@ -68,7 +72,7 @@ const applyDiscount = (rule) => {
 
     // Format tiền
     const formatted = formatMoney(newPrice)
-
+    priceElement.textContent = formatted
     discountDiv.innerHTML = `
         <div style="color: red; font-weight: bold; margin-top: 6px;">
             Discounted price: ${formatted}
