@@ -16,11 +16,9 @@ import {
   Text,
   InlineGrid,
   InlineStack,
-  Page,
   Badge,
   Box,
   ChoiceList,
-  Bleed,
   BlockStack,
 } from "@shopify/polaris";
 import { ArrowLeftIcon } from "@shopify/polaris-icons";
@@ -48,8 +46,9 @@ export default function EditRule({ ruleInfo, onSubmit, title, edit }) {
   const [isOpenWarnig, setOpenWarning] = useState(false);
   const apply = watch("apply");
   const type = watch("type");
-  const tags = watch("tags");
+  const tags = watch("tags") ?? [];
   const value = watch("value");
+
   useEffect(() => {
     if (ruleInfo) {
       Object.entries(ruleInfo).forEach(([key, val]) => {
@@ -62,9 +61,10 @@ export default function EditRule({ ruleInfo, onSubmit, title, edit }) {
       setOpenWarning(true);
     else setOpenWarning(false);
   }, [type, value]);
+
   const handleSetTags = useCallback(
     (updater) => {
-      setFormValue("tags", (prev) => updater(prev ?? []));
+      setFormValue("tags", updater);
     },
     [setFormValue]
   );
@@ -189,7 +189,7 @@ export default function EditRule({ ruleInfo, onSubmit, title, edit }) {
 
                   <ProductTag
                     activeTags={tags}
-                    setRule={handleSetTags}
+                    handleSetTags={handleSetTags}
                     apply={apply}
                   />
 

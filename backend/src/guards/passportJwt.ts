@@ -4,8 +4,8 @@ import { ShopModel } from 'src/models/shop.model'
 import dotenv from 'dotenv'
 dotenv.config()
 const opts = {
-  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(), // Lấy token từ header Authorization: Bearer <token>
-  secretOrKey: process.env.SHOPIFY_API_SECRET || 'your_secret_key' // Secret dùng để verify token
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: process.env.SHOPIFY_API_SECRET || 'your_secret_key'
 }
 
 // Middleware xác thực
@@ -24,9 +24,9 @@ passport.use(
         const iss = jwt_payload.iss
         const url = `${iss}/api/${version}/graphql.json`
         return done(null, { ...jwt_payload, shop, url })
-      } else return done(null, false)
+      }
       // 🔹 Nếu không có DB, chấp nhận luôn:
-      // return done(null, jwt_payload);
+      return done(null, jwt_payload)
     } catch (err) {
       return done(err, false)
     }

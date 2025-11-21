@@ -27,9 +27,9 @@ export const createShop = async (ctx: Context) => {
       ctx.body = { message: 'Invalid request body' }
       return
     }
-    const result = await handleCreateShop(body)
+    await handleCreateShop(body)
     ctx.status = 201
-    ctx.body = result;
+    // ctx.body = result;
   } catch (error) {
     console.error(error)
     ctx.status = 500
@@ -70,6 +70,5 @@ export const deleteShop = async (ctx: Context) => {
   } catch (error) {
     console.error(error)
     ctx.status = 500
-    
   }
 }

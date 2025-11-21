@@ -1,15 +1,18 @@
 <select id="discount-select">
   <option value="">-- Chọn discount --</option>
 </select>
-<div id="shop-url" style="display:none">{{shop.url| json}}</div>
-{% assign productTag = product.tags| json %}
-<div id="product-tag" style="display:none" >{{productTag}}</div>
-{% assign rules = app.metafields.rule_list.product_rule | parse_json| parse_json%}
-<div id="rules-data" style="display:none">
+<div id="shop-url"  style="display:none" >{{shop.url| json}}</div>
+{% assign product_tag = product.tags | json  %}
+<div id="product-tag" style="display:none" >{{product_tag}}</div>
+{% assign rules = app.metafields.rule_list.product_rule  %}
+<div id="rules-data" style="display:none" >
   {{ rules }}
 </div>
 <script src="{{'hello.js' | asset_url}}" defer></script>
-
+<div id="product-price-original" style="display:none">{{ product.price | money }}</div>
+<div id="product-price-discount"></div>
+<div id="format-money-shop" style="display:none"> {{ shop.money_format | json }}</div>
+<div id="currency-money-shop" style="display:none"> {{ shop.currency | json }}</div>
 {% schema %}
 {
   "name": "Discount Choose",

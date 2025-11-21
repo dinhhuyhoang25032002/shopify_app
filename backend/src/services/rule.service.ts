@@ -94,6 +94,7 @@ export const handlePushMetafield = async (url: string) => {
     ShopModel.findOne({ where: { shop: domain }, raw: true }),
     RuleModel.findAll({ raw: true })
   ])
+  console.log('shop', shop)
 
   const rulesList = rules.map((r) => ({
     id: r.id,
@@ -146,6 +147,6 @@ export const handlePushMetafield = async (url: string) => {
     }
   }
   const pushMetaData = await handleFetchApi({ url, shop }, queryPush)
-  console.log(util.inspect(pushMetaData, false, null, true /* enable colors */))
+  console.log(util.inspect(res, false, null, true /* enable colors */))
   return pushMetaData.data.metafieldsSet.metafields.length
 }

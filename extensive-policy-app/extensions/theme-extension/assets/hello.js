@@ -1,12 +1,24 @@
-const productTag = JSON.parse(document.getElementById('product-tag')?.textContent ?? "")
-const shopUrl = document.getElementById('shop-url')?.textContent
-const rulesData = JSON.parse(document.getElementById('rules-data')?.textContent ?? "")
+const productTag = JSON.parse(document.getElementById('product-tag')?.textContent);
+const shopUrl = document.getElementById('shop-url')?.textContent;
+const rulesData = JSON.parse(document.getElementById('rules-data')?.textContent);
+const formatMoneyShop = document.getElementById('format-money-shop')?.textContent
+const currency = JSON.parse(document.getElementById('currency-money-shop')?.textContent)
 
-const filtered = rulesData.filter(item =>
-    Array.isArray(item.tag) && item.tag.some(t => productTag.includes(t))
-);
+// Filter rule
+const filtered = rulesData.filter(item => {
+    if (item.apply === "ALL") return true;
+
+    if (item.apply === "TAGS") {
+        return Array.isArray(item.tag) && item.tag.some(t => productTag.includes(t));
+    }
+
+    return false;
+});
+
+
 const discountSelect = document.getElementById('discount-select');
 discountSelect.innerHTML = "";
+
 if (filtered.length === 0) {
     const option = document.createElement('option');
     option.value = "";
@@ -17,13 +29,68 @@ if (filtered.length === 0) {
     defaultOption.value = "";
     defaultOption.textContent = "-- Chọn discount --";
     discountSelect.appendChild(defaultOption);
+
     filtered.forEach(rule => {
         const option = document.createElement('option');
-        option.value = rule.name; // hoặc rule.id nếu có
+        option.value = rule.name;
         option.textContent = rule.name;
         discountSelect.appendChild(option);
     });
 }
+
+const originalPrice = parseFloat(
+    document.getElementById("product-price-original").textContent.replace(/[^0-9,.-]/g, "")  // bỏ ký tự không phải số
+        .replace(",", "")
+);
+console.log("formatMoneyShop", formatMoneyShop, originalPrice, currency);
+const formatMoney = (amount) => {
+    const characters = formatMoneyShop.trim().charAt(1)
+    const formatted = `${characters}${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })} ${currency}`;
+    return formatted
+}
+const applyDiscount = (rule) => {
+    const discountDiv = document.getElementById("product-price-discount");
+
+
+    let newPrice = originalPrice;
+
+    if (rule.type === "PERCENT") {
+        newPrice = originalPrice - (originalPrice * rule.value / 100);
+    }
+
+    if (rule.type === "SET_PRICE") {
+        newPrice = rule.value;
+    }
+
+    if (rule.type === "FIX_AMOUNT") {
+        newPrice = originalPrice - rule.value;
+    }
+
+    // Format tiền
+    const formatted = formatMoney(newPrice)
+
+    discountDiv.innerHTML = `
+        <div style="color: red; font-weight: bold; margin-top: 6px;">
+            Discounted price: ${formatted}
+        </div>
+    `;
+};
+// On change => apply discount
+discountSelect.addEventListener("change", () => {
+    const selectedName = discountSelect.value;
+
+    if (!selectedName) {
+        document.getElementById("product-price-discount").innerHTML = "";
+        return;
+    }
+
+    const rule = filtered.find(r => r.name === selectedName);
+    if (!rule) return;
+
+    applyDiscount(rule);
+});
+
+
 const handleFetchApi = async () => {
     const res = await (await fetch(`https://untenuous-li-frothily.ngrok-free.dev/api/rules/metafield`,
         {
@@ -31,12 +98,11 @@ const handleFetchApi = async () => {
                 'ngrok-skip-browser-warning': 'true',
                 "Content-Type": "application/json",
             },
-
             method: "POST",
             body: JSON.stringify({ url: JSON.parse(shopUrl) })
         }
-    )).json()
+    )).json();
     console.log('handleFetchApi', res);
-}
+};
 
-handleFetchApi()
+handleFetchApi();

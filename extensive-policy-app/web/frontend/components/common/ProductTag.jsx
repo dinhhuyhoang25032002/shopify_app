@@ -3,9 +3,7 @@ import {
   Popover,
   ActionList,
   Icon,
-  Tag,
   TextField,
-  BlockStack,
   Badge,
   InlineStack,
 } from "@shopify/polaris";
@@ -16,9 +14,9 @@ import { useQuery } from "react-query";
 import { APPLY_TYPE } from "../../const";
 import SkeletonExample from "../layout/SkeletonPage";
 
-export default memo(function ProductTag({ activeTags, setRule, apply }) {
+export default memo(function ProductTag({ activeTags, handleSetTags, apply }) {
   const [popoverActive, setPopoverActive] = useState(false);
-  console.log("ProductTag is here!", activeTags);
+  const [listTags, setListTags] = useState(activeTags);
   const { handleFetchApi } = useFetchApi();
   const { data: productTags, isLoading } = useQuery({
     queryKey: ["product-tag"],
@@ -32,11 +30,15 @@ export default memo(function ProductTag({ activeTags, setRule, apply }) {
   if (isLoading) return <SkeletonExample />;
 
   const handleSelect = (item) => {
-    setRule((prevTags) =>
-      prevTags.includes(item)
-        ? prevTags.filter((v) => v !== item)
-        : [...prevTags, item]
+    setListTags(
+      (prevTags) =>
+        prevTags.includes(item)
+          ? prevTags.filter((v) => v !== item) // remove tag
+          : [...prevTags, item] // add tag
     );
+    console.log("listTags", listTags);
+
+    handleSetTags(listTags);
   };
   const activator = (
     <Button
@@ -44,14 +46,14 @@ export default memo(function ProductTag({ activeTags, setRule, apply }) {
       disclosure
       disabled={apply === APPLY_TYPE.ALL ? true : false}
     >
-      Product Tags {activeTags.length ? `(${activeTags.length})` : ""}
+      Product Tags {listTags.length ? `(${listTags.length})` : ""}
     </Button>
   );
 
   const verticalContentMarkup =
-    activeTags.length > 0 ? (
+    listTags.length > 0 ? (
       <InlineStack gap="200" spacing="extraTight">
-        {activeTags.map((tag) => (
+        {listTags.map((tag) => (
           <Badge tone="success" key={tag}>
             {tag}
           </Badge>
@@ -80,15 +82,13 @@ export default memo(function ProductTag({ activeTags, setRule, apply }) {
             actionRole="menuitem"
             items={productTags.map((item) => ({
               content: item,
-              prefix: activeTags.includes(item) ? (
+              prefix: listTags.includes(item) ? (
                 <Icon source={CheckIcon} />
               ) : null,
               onAction: () => handleSelect(item),
             }))}
           />
         </Popover>
-
-        {/* Debug xem giá trị đã chọn */}
       </div>
     </>
   );
