@@ -3,17 +3,10 @@ import crypto from 'crypto'
 import dotenv from 'dotenv'
 dotenv.config()
 
-declare module 'koa' {
-  interface Request {
-    rawBody?: string
-  }
-}
-
 export async function shopifyWebhookVerifier(ctx: Context, next: Next) {
   // Chỉ áp dụng cho route webhook
   if (ctx.method === 'POST' && ctx.path.startsWith('/api/webhooks')) {
-    const rawBody = ctx.request.rawBody
-
+    const rawBody = ctx.request.rawBody as string
     const hmac = ctx.headers['x-shopify-hmac-sha256'] as string
     if (!hmac || !rawBody) {
       ctx.status = 400

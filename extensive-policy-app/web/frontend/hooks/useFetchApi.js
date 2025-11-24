@@ -12,8 +12,6 @@ export function useFetchApi() {
         try {
             setLoading(true)
             const token = await shopify.idToken();
-
-
             const res = await fetch(fullUrl, {
                 ...options,
                 headers: {

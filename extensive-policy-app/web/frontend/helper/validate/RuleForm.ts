@@ -6,9 +6,8 @@ export const ruleSchema = Yup.object().shape({
   status: Yup.string()
     .oneOf([STATUS_RULES.ENABLE, STATUS_RULES.DISABLE])
     .required(),
-  priority: Yup.number()
-    .typeError("Priority must be a number")
-    .min(1, "Priority must be greater than 0"),
+  priority: Yup.number().typeError("Priority must be a number")
+  .min(1, "Priority must be greater than 0"),
 
   apply: Yup.string().oneOf([APPLY_TYPE.ALL, APPLY_TYPE.TAGS]).required(),
 

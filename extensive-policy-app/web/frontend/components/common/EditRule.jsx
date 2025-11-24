@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { memo, useCallback, useEffect, useState } from "react";
 import { ruleSchema } from "../../helper/validate/RuleForm";
-import { useForm } from "react-hook-form";
+import { set, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { APPLY_TYPE, DISCOUNT_TYPE, STATUS_RULES } from "../../const";
 import ProductTag from "../../components/common/ProductTag";
 import ProductionList from "../../components/common/ProductionList";
+import _ from "lodash";
 import {
   Form,
   FormLayout,
@@ -23,13 +24,16 @@ import {
 } from "@shopify/polaris";
 import { ArrowLeftIcon } from "@shopify/polaris-icons";
 import { useNavigate } from "react-router-dom";
+import SaveBarComponent from "./SaveBar";
+import { useAppBridge } from "@shopify/app-bridge-react";
 
-export default function EditRule({ ruleInfo, onSubmit, title, edit }) {
+export default memo(function EditRule({ ruleInfo, onSubmit, title, edit }) {
   const {
     handleSubmit,
     setValue: setFormValue,
     watch,
     formState: { errors },
+    reset,
   } = useForm({
     resolver: yupResolver(ruleSchema),
     defaultValues: {
@@ -38,29 +42,36 @@ export default function EditRule({ ruleInfo, onSubmit, title, edit }) {
       apply: APPLY_TYPE.ALL,
       tags: [],
       type: "",
-      priority: 0,
+      priority: "",
       value: "",
     },
+    mode: "onChange",
   });
   const navigate = useNavigate();
-  const [isOpenWarnig, setOpenWarning] = useState(false);
+  const shopify = useAppBridge();
   const apply = watch("apply");
   const type = watch("type");
   const tags = watch("tags") ?? [];
   const value = watch("value");
-
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [prevRuleInfo, setPrevRuleInfo] = useState(null);
   useEffect(() => {
     if (ruleInfo) {
       Object.entries(ruleInfo).forEach(([key, val]) => {
         setFormValue(key, val);
       });
     }
+    setPrevRuleInfo(ruleInfo);
   }, [ruleInfo]);
   useEffect(() => {
-    if (type[0] === DISCOUNT_TYPE.PERCENT && (value < 0 || value > 100))
-      setOpenWarning(true);
-    else setOpenWarning(false);
-  }, [type, value]);
+    if (_.isEqual(prevRuleInfo, watch())) {
+      setIsEditMode(false);
+      shopify.saveBar.hide("my-save-bar");
+      return;
+    }
+    setIsEditMode(true);
+    shopify.saveBar.show("my-save-bar");
+  }, [prevRuleInfo, watch()]);
 
   const handleSetTags = useCallback(
     (updater) => {
@@ -69,9 +80,18 @@ export default function EditRule({ ruleInfo, onSubmit, title, edit }) {
     [setFormValue]
   );
 
+  const handleDiscard = () => {
+    setIsEditMode(false);
+    shopify.saveBar.hide("my-save-bar");
+    Object.entries(ruleInfo).forEach(([key, val]) => {
+      setFormValue(key, val);
+    });
+  };
+  console.log(onSubmit);
+
   return (
-    <Box padding={400}>
-      <Form onSubmit={handleSubmit(onSubmit)}>
+    <Box padding={400} background="bg-surface">
+      <Form>
         <FormLayout>
           {edit && (
             <InlineStack align="space-between">
@@ -79,17 +99,20 @@ export default function EditRule({ ruleInfo, onSubmit, title, edit }) {
                 <Button
                   icon={ArrowLeftIcon}
                   accessibilityLabel="Back"
-                  onClick={() => navigate("/rules")}
+                  onClick={() => {
+                    if (isEditMode) {
+                      return shopify.saveBar.leaveConfirmation();
+                    } else {
+                      navigate("/rules");
+                    }
+                  }}
                 />
 
                 <Text variant="headingXl" as="h3">
                   {title}
                 </Text>
+                <Button onClick={onSubmit(watch())}>Submit</Button>
               </InlineStack>
-
-              <Button tone="success" variant="primary" submit>
-                Submit
-              </Button>
             </InlineStack>
           )}
 
@@ -98,15 +121,18 @@ export default function EditRule({ ruleInfo, onSubmit, title, edit }) {
             <TextField
               label="Name"
               value={watch("name")}
-              onChange={(v) => setFormValue("name", v)}
+              onChange={(v) => {
+                setFormValue("name", v, { shouldValidate: true });
+              }}
               error={errors.name?.message}
             />
 
             <TextField
               label="Priority"
-              type="number"
               value={watch("priority")}
-              onChange={(v) => setFormValue("priority", Number(v))}
+              onChange={(v) =>
+                setFormValue("priority", v, { shouldValidate: true })
+              }
               error={errors.priority?.message}
             />
           </InlineGrid>
@@ -230,29 +256,24 @@ export default function EditRule({ ruleInfo, onSubmit, title, edit }) {
                       },
                     ]}
                     selected={type}
-                    onChange={(value) => setFormValue("type", value)}
+                    onChange={(value) => setFormValue("type", value[0])}
                   />
                   <Divider />
                   <Text variant="bodyLg" as="h3">
-                    {type[0] === DISCOUNT_TYPE.PERCENT
-                      ? "Percent (%)"
-                      : "Amount"}
+                    {type === DISCOUNT_TYPE.PERCENT ? "Percent (%)" : "Amount"}
                   </Text>
 
                   <TextField
-                    type="number"
                     value={value}
-                    onChange={(v) => setFormValue("value", Number(v))}
+                    onChange={(v) =>
+                      setFormValue("value", v, { shouldValidate: true })
+                    }
                     error={errors.value?.message}
                     helpText={
-                      isOpenWarnig ? (
-                        <span style={{ color: "red" }}>Invalid Value</span>
-                      ) : (
-                        <span>
-                          The price will be adjusted based on your Shopify
-                          Markets setting.
-                        </span>
-                      )
+                      <span>
+                        The price will be adjusted based on your Shopify Markets
+                        setting.
+                      </span>
                     }
                   />
                 </InlineGrid>
@@ -268,10 +289,8 @@ export default function EditRule({ ruleInfo, onSubmit, title, edit }) {
               applyType={apply}
               discountType={type}
               value={
-                type === DISCOUNT_TYPE.PERCENT
-                  ? value > 0 && value <= 100
-                    ? value
-                    : null
+                type === DISCOUNT_TYPE.PERCENT && errors.value?.message
+                  ? null
                   : value
               }
             />
@@ -283,8 +302,13 @@ export default function EditRule({ ruleInfo, onSubmit, title, edit }) {
               </Button>
             </div>
           )}
+
+          <SaveBarComponent
+            handleSave={() => onSubmit({ ...watch() })}
+            handleDiscard={handleDiscard}
+          />
         </FormLayout>
       </Form>
     </Box>
   );
-}
+});

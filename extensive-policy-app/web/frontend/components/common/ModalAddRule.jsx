@@ -1,49 +1,28 @@
 import { Modal, TitleBar } from "@shopify/app-bridge-react";
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  InlineGrid,
-  InlineStack,
-  Select,
-} from "@shopify/polaris";
-import { Form, FormLayout, TextField } from "@shopify/polaris";
-import { useCallback, useState } from "react";
-import { STATUS_RULES } from "../../const";
+import { useCallback } from "react";
 import { useFetchApi } from "../../hooks/useFetchApi";
 import EditRule from "./EditRule";
 import { PolarisProvider } from "../providers/PolarisProvider";
+import { useShopInfo } from "../../hooks/useShopInfo";
 
-export default function ModalAddRule({ refetchRules, setConfirmDelete }) {
-  const [rule, setRule] = useState({
-    name: "",
-    status: STATUS_RULES.ENABLE,
-    priority: 0,
-  });
-  const { isLoading, handleFetchApi } = useFetchApi();
+export default function ModalAddRule({ refetchRules }) {
+  const { handleFetchApi } = useFetchApi();
+  const { shopInfo } = useShopInfo();
 
-  const options = [
-    { label: STATUS_RULES.ENABLE, value: STATUS_RULES.ENABLE },
-    { label: STATUS_RULES.DISABLE, value: STATUS_RULES.DISABLE },
-  ];
   const handleSubmit = useCallback(async (formData) => {
+    console.log("shopInfo.shop", shopInfo);
+
     try {
       await handleFetchApi(`rules`, {
         method: "POST",
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, shop: shopInfo.shop }),
       });
-      shopify.modal.hide("my-modal");
-      await refetchRules();
+      shopify.modal.hide("add-rule-modal");
       shopify.toast.show("Create rule success.");
+      await refetchRules();
     } catch (error) {
-      console.log(error);
+        console.log(error);
       return;
-    } finally {
-      setRule({
-        name: "",
-        status: STATUS_RULES.ENABLE,
-        priority: 0,
-      });
     }
   }, []);
 

@@ -307,7 +307,7 @@ export default memo(function RuleTable({
         refetchRules={refetchRules}
         ruleDelete={ruleDelete}
       />
-      <ModalAddRule />
+      <ModalAddRule refetchRules={refetchRules}/>
     </Card>
   );
 });

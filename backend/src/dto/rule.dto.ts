@@ -31,4 +31,8 @@ export class RuleDto {
   @IsJSON()
   @IsOptional()
   value?: number
+
+  @IsString()
+  @IsNotEmpty()
+  shop!: string
 }

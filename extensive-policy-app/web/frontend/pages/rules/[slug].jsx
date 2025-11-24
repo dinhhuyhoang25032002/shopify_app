@@ -7,10 +7,11 @@ import SkeletonExample from "../../components/layout/SkeletonPage";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { useCallback } from "react";
 import EditRule from "../../components/common/EditRule";
+import { useShopInfo } from "../../hooks/useShopInfo";
 export default function EditRulePage() {
   const { slug } = useParams();
   const { handleFetchApi } = useFetchApi();
-
+  const { shopInfo } = useShopInfo();
   const {
     isLoading,
     data: ruleInfo,
@@ -25,9 +26,11 @@ export default function EditRulePage() {
 
   const onSubmit = useCallback(async (formData) => {
     try {
+      console.log("formData", formData);
+
       await handleFetchApi(`rules/${slug}`, {
         method: "PATCH",
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, shop: shopInfo?.shop }),
       });
 
       shopify.toast.show("Change rule successfully.");
@@ -39,13 +42,13 @@ export default function EditRulePage() {
 
   if (isLoading) return <SkeletonExample />;
   return (
-    <Page>
-      <EditRule
-        ruleInfo={ruleInfo}
-        onSubmit={onSubmit}
-        title={`Edit custom pricing rule "${ruleInfo.name}"`}
-        edit={true}
-      />
-    </Page>
+      <Page>
+        <EditRule
+          ruleInfo={ruleInfo}
+          onSubmit={onSubmit}
+          title={`Edit custom pricing rule "${ruleInfo.name}"`}
+          edit={true}
+        />
+      </Page>
   );
 }

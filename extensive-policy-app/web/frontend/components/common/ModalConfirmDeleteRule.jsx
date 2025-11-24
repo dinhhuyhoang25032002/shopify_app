@@ -56,13 +56,17 @@ export default function ModalConfirmDeleteRule({ refetchRules, ruleDelete }) {
             <Button onClick={() => shopify.modal.hide("confirm-delete-modal")}>
               Cancel
             </Button>
-            <Button
-              variant="primary"
-              tone="critical"
-              onClick={handleDeleteSubmit}
-            >
-              Delete
-            </Button>
+            {!isLoading ? (
+              <Button
+                variant="primary"
+                tone="critical"
+                onClick={handleDeleteSubmit}
+              >
+                Delete
+              </Button>
+            ) : (
+              <Button loading>Save product</Button>
+            )}
           </ButtonGroup>
         </BlockStack>
       </Box>

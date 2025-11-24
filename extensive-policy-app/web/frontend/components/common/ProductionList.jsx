@@ -17,6 +17,7 @@ import { useFetchApi } from "../../hooks/useFetchApi";
 import { DISCOUNT_TYPE, LIMIT, STATUS_RULES } from "../../const";
 import { memo, useEffect, useState } from "react";
 import PaginationTable from "./PaginationTable";
+import { useDebounce } from "../../hooks/useDebounce";
 
 export default memo(function ProductionList({
   status,
@@ -27,12 +28,11 @@ export default memo(function ProductionList({
   const params = new URLSearchParams();
   activeTags?.forEach((tag) => params.append("tag", tag));
   const { handleFetchApi } = useFetchApi();
-  //const [index, setIndex] = useState(0);
   const [cursorStack, setCursorStack] = useState([]);
   const currentCursor = cursorStack[cursorStack.length - 1] ?? null;
-
+  const debouncedValue = useDebounce(activeTags, 800);
   const { data: productData, isLoading } = useQuery({
-    queryKey: ["products", activeTags, currentCursor],
+    queryKey: ["products", debouncedValue, currentCursor],
     queryFn: async () => {
       const last = currentCursor || undefined;
       const query = `products?${params.toString()}${

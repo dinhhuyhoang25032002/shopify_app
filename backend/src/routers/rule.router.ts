@@ -5,8 +5,6 @@ import {
   getRule,
   getRules,
   getRulesBySearch,
-  pushMetafield,
-  // getRulesByTags,
   updateRule
 } from '@/controllers/rule.controller'
 
@@ -17,13 +15,12 @@ const router = new Router({
 
 // POST
 router.post('/', createRule)
-router.post('/metafield', pushMetafield)
-router.post('/:id', duplicateRule)
+
+router.post('/duplication/:id', duplicateRule)
 
 // GET
 router.get('/', getRules)
 router.get('/search', getRulesBySearch)
-// router.get('/tags', getRulesByTags)
 router.get('/:id', getRule)
 
 // PATCH

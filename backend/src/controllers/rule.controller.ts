@@ -6,15 +6,14 @@ import {
   handleDuplicateRule,
   handleGetRules,
   handleUpdateRuleById,
-  handleGetRulesBySearch,
-  handlePushMetafield
-  // handleGetRulesByTags
+  handleGetRulesBySearch
 } from 'src/services/rule.service'
 import { Context } from 'koa'
 export const createRule = async (ctx: Context) => {
   try {
     const body = ctx.request.body as any as RuleDto
-    const result = await handleCreateRule(body)
+    const url = ctx.state.user.url as string
+    const result = await handleCreateRule(body, url)
     ctx.status = 201
     ctx.body = result
   } catch (error) {
@@ -128,23 +127,6 @@ export const deleteRule = async (ctx: Context) => {
     }
   } catch (error) {
     console.error(error)
-    ctx.status = 500
-  }
-}
-
-export const pushMetafield = async (ctx: Context) => {
-  try {
-    const body = ctx.request.body as { url: string }
-
-    const version = '2025-07'
-    const graphqlUrl = `${body.url}/admin/api/${version}/graphql.json`
-
-    const result = await handlePushMetafield(graphqlUrl)
-    ctx.status = 200
-    ctx.body = { result: result > 0 }
-  } catch (error) {
-    console.log(error)
-
     ctx.status = 500
   }
 }

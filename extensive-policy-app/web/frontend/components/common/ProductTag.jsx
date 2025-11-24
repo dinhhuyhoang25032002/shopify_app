@@ -59,14 +59,6 @@ export default memo(function ProductTag({ activeTags, handleSetTags, apply }) {
     ) : null;
   return (
     <>
-      <TextField
-        label=""
-        // value={textFieldValue}
-        //onChange={handleTextFieldChange}
-        placeholder="Tags"
-        //autoComplete="off"
-        verticalContent={verticalContentMarkup}
-      />
       <div style={{ display: "flex", justifyContent: "end" }}>
         <Popover
           active={popoverActive}
@@ -87,6 +79,16 @@ export default memo(function ProductTag({ activeTags, handleSetTags, apply }) {
           />
         </Popover>
       </div>
+      {listTags.length > 0 && (
+        <TextField
+          label=""
+          // value={textFieldValue}
+          //onChange={handleTextFieldChange}
+          placeholder="Tags Selected"
+          //autoComplete="off"
+          verticalContent={verticalContentMarkup}
+        />
+      )}
     </>
   );
 });

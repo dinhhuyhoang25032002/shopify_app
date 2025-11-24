@@ -13,6 +13,7 @@ export class RuleModel extends Model<RuleDto, RuleCreationAttributes> implements
   declare type: string
   declare value: number
   declare tags: string
+  declare shop: string
 }
 RuleModel.init(
   {
@@ -45,7 +46,8 @@ RuleModel.init(
     value: { type: DataTypes.NUMBER },
     tags: {
       type: DataTypes.TEXT
-    }
+    },
+    shop: { type: DataTypes.STRING, allowNull: false }
   },
   {
     sequelize,

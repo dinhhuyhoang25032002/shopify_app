@@ -1,13 +1,11 @@
-import { handleGetProducts } from 'src/services/product.service'
 import { Context } from 'koa'
-import { handleGetProductTag } from '@/services/product.service'
+import { handleGetProductTag, handleGetProducts } from '@/services/product.service'
 
 export const getProducts = async (ctx: Context) => {
   try {
     const user = ctx.state.user
     const tags = ctx.query.tag
     const last = ctx.query.last
-
 
     const products = await handleGetProducts(user, tags, last)
 

@@ -6,7 +6,7 @@ import serveStatic from "serve-static";
 import shopify from "./shopify.js";
 import productCreator from "./product-creator.js";
 import PrivacyWebhookHandlers from "./privacy.js";
-import { afterAuth } from "./services/shop.services.js";
+import { afterAuth } from "./util/shop.js";
 import sequelize from "./db.js";
 const PORT = parseInt(
   process.env.BACKEND_PORT || process.env.PORT || "61049",

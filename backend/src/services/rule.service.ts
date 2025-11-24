@@ -1,14 +1,18 @@
 import { RuleDto } from 'src/dto/rule.dto'
 import { RuleModel } from 'src/models/rule.model'
-import util from 'util'
 import { Op } from 'sequelize'
-import { handleFetchApi } from '@/util/handleFetchApi'
-import { ShopModel } from '@/models/shop.model'
-export const handleCreateRule = async (body: RuleDto): Promise<RuleDto> => {
+import { handlePushMetafield } from '@/util/pushMetafield'
+
+export const handleCreateRule = async (body: RuleDto, url: string): Promise<RuleDto> => {
   try {
-    return RuleModel.create(body, { raw: true })
+    console.log('url', url, body)
+
+    const newRule = await RuleModel.create({ ...body, tags: JSON.stringify(body.tags) }, { raw: true })
+    // await handlePushMetafield(url)
+    return newRule
   } catch (error) {
-    throw new Error('Error creating rule.')
+    console.log(error)
+    throw error
   }
 }
 
@@ -85,68 +89,4 @@ export const handleGetRuleByName = async (name: string) => {
   }
 
   return ruleParse
-}
-
-export const handlePushMetafield = async (url: string) => {
-  const domain = new URL(url).hostname
-
-  const [shop, rules] = await Promise.all([
-    ShopModel.findOne({ where: { shop: domain }, raw: true }),
-    RuleModel.findAll({ raw: true })
-  ])
-  console.log('shop', shop)
-
-  const rulesList = rules.map((r) => ({
-    id: r.id,
-    name: r.name,
-    status: r.status,
-    apply: r.apply,
-    value: r.value,
-    type: r.type,
-    priority: r.priority,
-    tags: r.tags ? JSON.parse(r.tags as string) : []
-  }))
-
-  const value = JSON.stringify(rulesList)
-
-  const query = {
-    query: `query {
-        currentAppInstallation {
-        id
-      }
-    }`
-  }
-
-  const res = await handleFetchApi({ url, shop }, query)
-  const idApp = res.data.currentAppInstallation.id
-  const queryPush = {
-    query: `mutation CreateAppDataMetafield($metafieldsSetInput: [MetafieldsSetInput!]!) {
-      metafieldsSet(metafields: $metafieldsSetInput) {
-        metafields {
-          id
-          namespace
-          key
-          value
-        }
-        userErrors {
-          field
-          message
-        }
-      }
-    }`,
-    variables: {
-      metafieldsSetInput: [
-        {
-          namespace: 'rule_list',
-          key: 'product_rule',
-          type: 'json',
-          value: value,
-          ownerId: idApp
-        }
-      ]
-    }
-  }
-  const pushMetaData = await handleFetchApi({ url, shop }, queryPush)
-  console.log(util.inspect(res, false, null, true /* enable colors */))
-  return pushMetaData.data.metafieldsSet.metafields.length
 }
