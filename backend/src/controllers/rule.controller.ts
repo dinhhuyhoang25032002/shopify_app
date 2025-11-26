@@ -26,10 +26,11 @@ export const createRule = async (ctx: Context) => {
 export const duplicateRule = async (ctx: Context) => {
   try {
     const ruleId = ctx.params.id
+    console.log('ruleId', ruleId)
+
     const user = ctx.state.user as PayLoadJWT
     const { url } = user
     const duplicated = await handleDuplicateRule(ruleId, url)
-
     ctx.status = 201
     ctx.body = duplicated
   } catch (error: any) {

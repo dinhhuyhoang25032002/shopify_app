@@ -71,8 +71,8 @@ export default memo(function EditRule({ ruleInfo, onSubmit, title, edit }) {
     if (
       deepEqual(prevRuleInfo, {
         ...currentValues,
-        priority: Number(currentValues.priority),
-        value: Number(currentValues.value),
+        priority: currentValues.priority ? Number(currentValues.priority) : "",
+        value: currentValues.value ? Number(currentValues.value) : "",
       })
     ) {
       setIsEditMode(false);
