@@ -16,7 +16,8 @@ const router = new Router({
 // POST
 router.post('/', createRule)
 
-router.post('/duplication/:id', duplicateRule)
+//PUT
+router.put('/duplication/:id', duplicateRule)
 
 // GET
 router.get('/', getRules)

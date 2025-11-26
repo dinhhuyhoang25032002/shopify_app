@@ -1,24 +1,24 @@
 import { useEffect, useState } from "react";
 import { useFetchApi } from "./useFetchApi";
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchShopInfo } from "../stores/redux-toolkit/slices/shop.slice";
 
 export function useShopInfo() {
-  const { handleFetchApi, isLoading } = useFetchApi();
-  const [shopInfo, setShopInfo] = useState(null);
-
+  const { handleFetchApi } = useFetchApi();
+  const shop = useSelector(state => state.shop)
+  const [count, setCount] = useState(0);
+  const dispatch = useDispatch();
   useEffect(() => {
-    const fetchShopInfo = async () => {
-      try {
-        const data = await handleFetchApi("shop");
-        console.log("data", data);
-        if (!isLoading) {
-          setShopInfo(data);
-        }
+    if (!shop.shop && count <= 3) {
+      dispatch(fetchShopInfo(handleFetchApi));
+      setCount(prev => prev + 1);
+      return
+    }
+    console.log("shop.shop", shop.shop);
+    if (count > 3) {
 
-      } catch (error) {
-        console.error("Error fetching shop info:", error);
-      }
-    };
-    fetchShopInfo();
-  }, []);
-  return { shopInfo, isLoading, };
+      return
+    }
+  }, [shop, handleFetchApi, fetchShopInfo, dispatch, count]);
+  return shop;
 }

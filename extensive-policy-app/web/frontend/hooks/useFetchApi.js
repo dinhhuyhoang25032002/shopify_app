@@ -22,7 +22,9 @@ export function useFetchApi() {
                 },
             })
             if (!res.ok) {
-                throw new Error(`Fetch failed with status: ${res.status}`);
+                const data = await res.json()
+                shopify.toast.show(data.message || 'Something went wrong')
+                throw new Error(`${data.message}`)
             }
             if (res.status === 401) {
                 console.warn("Token expired → refetching...");

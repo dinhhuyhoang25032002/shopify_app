@@ -14,12 +14,12 @@ import { STATUS_RULES, LIMIT } from "../../const";
 import { useNavigate } from "react-router-dom";
 import { PlusIcon } from "@shopify/polaris-icons";
 import { Button } from "@shopify/polaris";
-import { Pagination, Spinner } from "@shopify/polaris";
+import { Spinner } from "@shopify/polaris";
 import { useAppBridge } from "@shopify/app-bridge-react";
 import { useDebounce } from "../../hooks/useDebounce";
 import { DuplicateIcon, EditIcon, DeleteIcon } from "@shopify/polaris-icons";
 import PaginationTable from "./PaginationTable";
-import ModalAddRule from "./ModalAddRule";
+
 import ModalConfirmDeleteRule from "./ModalConfirmDeleteRule";
 
 export default memo(function RuleTable({
@@ -120,7 +120,9 @@ export default memo(function RuleTable({
 
   const handleDuplicateRule = async (id) => {
     try {
-      await handleFetchApi(`/rules/${id}`, { method: "POST" });
+      await handleFetchApi(`/rules/duplication/${id}`, {
+        method: "PUT",
+      });
       shopify.toast.show("Created Copy Rule.");
       await refetchRules();
     } catch (error) {
@@ -128,8 +130,8 @@ export default memo(function RuleTable({
     }
   };
 
-  const handleDeleteRule = async (name) => {
-    setRuleDelete(name);
+  const handleDeleteRule = async (id, name) => {
+    setRuleDelete({ id, name });
     shopify.modal.show("confirm-delete-modal");
   };
 
@@ -183,7 +185,7 @@ export default memo(function RuleTable({
               disabled={allResourcesSelected}
               onClick={(e) => {
                 e.stopPropagation();
-                navigate(`/rules/${name}`);
+                navigate(`/rules/${id}`);
               }}
             />
             <Button
@@ -199,7 +201,7 @@ export default memo(function RuleTable({
               accessibilityLabel="Delete Role"
               onClick={(e) => {
                 e.stopPropagation();
-                handleDeleteRule(name);
+                handleDeleteRule(id, name);
               }}
             />
           </div>
@@ -221,7 +223,7 @@ export default memo(function RuleTable({
         <Button
           icon={PlusIcon}
           variant="primary"
-          onClick={() => shopify.modal.show("add-rule-modal")}
+          onClick={() => navigate("/rules/create")}
         >
           Add Rule
         </Button>
@@ -307,7 +309,6 @@ export default memo(function RuleTable({
         refetchRules={refetchRules}
         ruleDelete={ruleDelete}
       />
-      <ModalAddRule refetchRules={refetchRules}/>
     </Card>
   );
 });

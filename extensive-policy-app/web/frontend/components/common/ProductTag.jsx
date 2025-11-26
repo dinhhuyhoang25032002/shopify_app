@@ -6,13 +6,13 @@ import {
   TextField,
   Badge,
   InlineStack,
+  SkeletonBodyText,
 } from "@shopify/polaris";
 import { CheckIcon } from "@shopify/polaris-icons";
 import { useState, useCallback, memo } from "react";
 import { useFetchApi } from "../../hooks/useFetchApi";
 import { useQuery } from "react-query";
 import { APPLY_TYPE } from "../../const";
-import SkeletonExample from "../layout/SkeletonPage";
 
 export default memo(function ProductTag({ activeTags, handleSetTags, apply }) {
   const [popoverActive, setPopoverActive] = useState(false);
@@ -27,7 +27,7 @@ export default memo(function ProductTag({ activeTags, handleSetTags, apply }) {
     []
   );
 
-  if (isLoading) return <SkeletonExample />;
+  if (isLoading) return <SkeletonBodyText />;
 
   const handleSelect = (item) => {
     const updatedTags = listTags.includes(item)

@@ -18,7 +18,7 @@ const initialState = {
     last_name: "",
     sender_email: "",
     status: "",
-    loading: false,
+    loading: null,
     error: null,
 }
 const shopSlice = createSlice({

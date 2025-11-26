@@ -1,11 +1,11 @@
 import { memo, useCallback, useEffect, useState } from "react";
 import { ruleSchema } from "../../helper/validate/RuleForm";
-import { set, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { APPLY_TYPE, DISCOUNT_TYPE, STATUS_RULES } from "../../const";
 import ProductTag from "../../components/common/ProductTag";
 import ProductionList from "../../components/common/ProductionList";
-import _ from "lodash";
+
 import {
   Form,
   FormLayout,
@@ -24,13 +24,14 @@ import {
 } from "@shopify/polaris";
 import { ArrowLeftIcon } from "@shopify/polaris-icons";
 import { useNavigate } from "react-router-dom";
-import SaveBarComponent from "./SaveBar";
-import { useAppBridge } from "@shopify/app-bridge-react";
-
+import { SaveBar, useAppBridge } from "@shopify/app-bridge-react";
+import { deepEqual } from "fast-equals";
 export default memo(function EditRule({ ruleInfo, onSubmit, title, edit }) {
   const {
     handleSubmit,
     setValue: setFormValue,
+    clearErrors,
+    trigger,
     watch,
     formState: { errors },
     reset,
@@ -41,7 +42,7 @@ export default memo(function EditRule({ ruleInfo, onSubmit, title, edit }) {
       status: STATUS_RULES.ENABLE,
       apply: APPLY_TYPE.ALL,
       tags: [],
-      type: "",
+      type: DISCOUNT_TYPE.SET_PRICE,
       priority: "",
       value: "",
     },
@@ -53,6 +54,7 @@ export default memo(function EditRule({ ruleInfo, onSubmit, title, edit }) {
   const type = watch("type");
   const tags = watch("tags") ?? [];
   const value = watch("value");
+  const currentValues = watch();
   const [isEditMode, setIsEditMode] = useState(false);
   const [prevRuleInfo, setPrevRuleInfo] = useState(null);
   useEffect(() => {
@@ -60,19 +62,44 @@ export default memo(function EditRule({ ruleInfo, onSubmit, title, edit }) {
       Object.entries(ruleInfo).forEach(([key, val]) => {
         setFormValue(key, val);
       });
-    }
-    setPrevRuleInfo(ruleInfo);
-  }, [ruleInfo]);
-  useEffect(() => {
-    if (_.isEqual(prevRuleInfo, watch())) {
-      setIsEditMode(false);
-      shopify.saveBar.hide("my-save-bar");
+      setPrevRuleInfo(ruleInfo);
       return;
     }
-    setIsEditMode(true);
-    shopify.saveBar.show("my-save-bar");
-  }, [prevRuleInfo, watch()]);
+    setPrevRuleInfo(watch());
+  }, [ruleInfo]);
+  useEffect(() => {
+    if (
+      deepEqual(prevRuleInfo, {
+        ...currentValues,
+        priority: Number(currentValues.priority),
+        value: Number(currentValues.value),
+      })
+    ) {
+      setIsEditMode(false);
+      shopify.saveBar.hide("mysavebar");
+      return;
+    }
+    console.log(currentValues, prevRuleInfo);
 
+    setIsEditMode(true);
+    shopify.saveBar.show("mysavebar");
+  }, [prevRuleInfo, currentValues]);
+  useEffect(() => {
+    const handlePopState = (event) => {
+      console.log("event", event);
+
+      if (isEditMode) {
+        event.preventDefault();
+        shopify.saveBar.leaveConfirmation();
+        history.pushState(null, null, window.location.href); // giữ nguyên trang
+        return;
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [isEditMode, shopify]);
   const handleSetTags = useCallback(
     (updater) => {
       setFormValue("tags", updater);
@@ -82,40 +109,41 @@ export default memo(function EditRule({ ruleInfo, onSubmit, title, edit }) {
 
   const handleDiscard = () => {
     setIsEditMode(false);
-    shopify.saveBar.hide("my-save-bar");
-    Object.entries(ruleInfo).forEach(([key, val]) => {
-      setFormValue(key, val);
-    });
+    shopify.saveBar.hide("mysavebar");
+    if (edit && ruleInfo) {
+      Object.entries(ruleInfo).forEach(([key, val]) => {
+        setFormValue(key, val);
+      });
+      clearErrors();
+    } else {
+      reset();
+      setPrevRuleInfo(watch());
+    }
   };
-  console.log(onSubmit);
 
   return (
     <Box padding={400} background="bg-surface">
-      <Form>
+      <Form onSubmit={handleSubmit(onSubmit)}>
         <FormLayout>
-          {edit && (
-            <InlineStack align="space-between">
-              <InlineStack gap="400" columns={2} align="center">
-                <Button
-                  icon={ArrowLeftIcon}
-                  accessibilityLabel="Back"
-                  onClick={() => {
-                    if (isEditMode) {
-                      return shopify.saveBar.leaveConfirmation();
-                    } else {
-                      navigate("/rules");
-                    }
-                  }}
-                />
+          <InlineStack align="space-between">
+            <InlineStack gap="400" columns={2} align="center">
+              <Button
+                icon={ArrowLeftIcon}
+                accessibilityLabel="Back"
+                onClick={() => {
+                  if (isEditMode) {
+                    return shopify.saveBar.leaveConfirmation();
+                  } else {
+                    navigate("/rules");
+                  }
+                }}
+              />
 
-                <Text variant="headingXl" as="h3">
-                  {title}
-                </Text>
-                <Button onClick={onSubmit(watch())}>Submit</Button>
-              </InlineStack>
+              <Text variant="headingXl" as="h3">
+                {title}
+              </Text>
             </InlineStack>
-          )}
-
+          </InlineStack>
           {/* Name + Priority */}
           <InlineGrid gap="400" columns={2}>
             <TextField
@@ -129,6 +157,7 @@ export default memo(function EditRule({ ruleInfo, onSubmit, title, edit }) {
 
             <TextField
               label="Priority"
+              type="text"
               value={watch("priority")}
               onChange={(v) =>
                 setFormValue("priority", v, { shouldValidate: true })
@@ -175,8 +204,7 @@ export default memo(function EditRule({ ruleInfo, onSubmit, title, edit }) {
               </Button>
             </InlineStack>
           </Card>
-
-          <InlineGrid gap="400" columns={edit ? 2 : 1}>
+          <InlineGrid gap="400" columns={2}>
             {/* APPLY TO PRODUCTS */}
 
             <BlockStack gap="300">
@@ -256,7 +284,12 @@ export default memo(function EditRule({ ruleInfo, onSubmit, title, edit }) {
                       },
                     ]}
                     selected={type}
-                    onChange={(value) => setFormValue("type", value[0])}
+                    onChange={(value) => {
+                      const newType = value[0];
+                      setFormValue("type", newType, { shouldValidate: true });
+                      clearErrors("value");
+                      trigger("value");
+                    }}
                   />
                   <Divider />
                   <Text variant="bodyLg" as="h3">
@@ -265,6 +298,7 @@ export default memo(function EditRule({ ruleInfo, onSubmit, title, edit }) {
 
                   <TextField
                     value={value}
+                    type="text"
                     onChange={(v) =>
                       setFormValue("value", v, { shouldValidate: true })
                     }
@@ -280,35 +314,31 @@ export default memo(function EditRule({ ruleInfo, onSubmit, title, edit }) {
               </Box>
             </BlockStack>
           </InlineGrid>
-
           {/* PRODUCT PREVIEW */}
-          {edit && (
-            <ProductionList
-              status={watch("status")}
-              activeTags={tags}
-              applyType={apply}
-              discountType={type}
-              value={
-                type === DISCOUNT_TYPE.PERCENT && errors.value?.message
-                  ? null
-                  : value
-              }
-            />
-          )}
-          {!edit && (
-            <div style={{ display: "flex", justifyContent: "end" }}>
-              <Button tone="success" variant="primary" submit>
-                Submit
-              </Button>
-            </div>
-          )}
 
-          <SaveBarComponent
-            handleSave={() => onSubmit({ ...watch() })}
-            handleDiscard={handleDiscard}
+          <ProductionList
+            status={watch("status")}
+            activeTags={tags}
+            applyType={apply}
+            discountType={type}
+            value={
+              type === DISCOUNT_TYPE.PERCENT && errors.value?.message
+                ? null
+                : value
+            }
           />
         </FormLayout>
       </Form>
+      <SaveBar id="mysavebar">
+        <button
+          variant="primary"
+          onClick={handleSubmit((data) => {
+            onSubmit(data);
+            if (!edit) reset();
+          })}
+        ></button>
+        <button onClick={handleDiscard}></button>
+      </SaveBar>
     </Box>
   );
 });

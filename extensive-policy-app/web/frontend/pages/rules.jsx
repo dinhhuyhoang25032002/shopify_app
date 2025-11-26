@@ -1,17 +1,6 @@
-import {
-  Card,
-  Page,
-  Layout,
-  TextContainer,
-  Image,
-  BlockStack,
-  Link,
-  Text,
-} from "@shopify/polaris";
-import { TitleBar, useAppBridge } from "@shopify/app-bridge-react";
-import { useTranslation, Trans } from "react-i18next";
-import { trophyImage } from "../assets";
-import { ProductsCard } from "../components/ProductsCard";
+import { Page, Layout } from "@shopify/polaris";
+import { TitleBar } from "@shopify/app-bridge-react";
+import { useTranslation } from "react-i18next";
 import RuleTable from "../components/common/RuleTable";
 import { useState } from "react";
 import { useFetchApi } from "../hooks/useFetchApi";
@@ -23,7 +12,7 @@ export default function RulePage() {
 
   const { handleFetchApi } = useFetchApi();
   const {
-    data:rulesData,
+    data: rulesData,
     refetch: refetchRules,
     isLoading: isLoadingCount,
   } = useQuery({
@@ -31,12 +20,9 @@ export default function RulePage() {
     queryFn: async () => handleFetchApi(`rules?index=${index}`),
     onError: (err) => {
       if (err.message === "UNAUTHORIZED") {
-        refetchRules(); // Gọi lại API lấy token mới
+        refetchRules();
       }
     },
-    // staleTime: Infinity,
-    // refetchOnWindowFocus: false,
-    // keepPreviousData: true,
   });
   return (
     <Page>
@@ -52,9 +38,6 @@ export default function RulePage() {
             total={rulesData?.total}
           />
         </Layout.Section>
-        {/* <Layout.Section>
-          <ProductsCard />
-        </Layout.Section> */}
       </Layout>
     </Page>
   );

@@ -1,9 +1,5 @@
 import { IsInt, IsJSON, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 export class RuleDto {
-  @IsInt()
-  @IsOptional()
-  id?: number
-
   @IsNotEmpty()
   @IsString()
   name!: string
@@ -29,10 +25,6 @@ export class RuleDto {
   tags?: string[] | string
 
   @IsJSON()
-  @IsOptional()
-  value?: number
-
-  @IsString()
   @IsNotEmpty()
-  shop!: string
+  value!: number
 }

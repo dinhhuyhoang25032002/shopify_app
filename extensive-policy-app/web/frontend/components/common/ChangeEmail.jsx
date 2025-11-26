@@ -5,19 +5,20 @@ import {
   InlineGrid,
   TextField,
 } from "@shopify/polaris";
-import { Dispatch, useState } from "react";
-import { useSelector } from "react-redux";
+import { useState } from "react";
+
 import { useFetchApi } from "../../hooks/useFetchApi";
 import { useAppBridge } from "@shopify/app-bridge-react";
+import { useShopInfo } from "../../hooks/useShopInfo";
 
 export default function ChangeEmail({ value, setEditting }) {
   const [email, setEmail] = useState(value ?? "");
-  const { shop } = useSelector((state) => state.shop);
+  const shop = useShopInfo();
   const shopify = useAppBridge();
   const { handleFetchApi } = useFetchApi();
   const handleSubmit = async () => {
     try {
-      await handleFetchApi(`shop/${shop}`, {
+      await handleFetchApi(`shop/${shop?.shop}`, {
         method: "PATCH",
         body: JSON.stringify({ sender_email: email }),
       });

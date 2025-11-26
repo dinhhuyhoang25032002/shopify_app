@@ -10,14 +10,18 @@ import {
 } from "@shopify/polaris";
 import { QuestionCircleIcon, EditIcon } from "@shopify/polaris-icons";
 import { useState } from "react";
-import { useSelector } from "react-redux";
+
 import { Link } from "react-router-dom";
 import { trophyImage } from "../../assets";
 import ChangeEmail from "./ChangeEmail";
+import { useShopInfo } from "../../hooks/useShopInfo";
+import SkeletonExample from "../layout/SkeletonPage";
 export default function ShopInfor() {
-  const { first_name, email } = useSelector((state) => state.shop);
+  const shop = useShopInfo();
+  const { first_name, email, loading } = shop || {};
   const [isOpenEmail, setOpenEmail] = useState(true);
   const [isEditting, setEditting] = useState(false);
+  if (loading) return <SkeletonExample />;
   return (
     <Card padding={800}>
       <InlineGrid gap="500" columns={1}>

@@ -9,34 +9,33 @@ import {
   handleGetRulesBySearch
 } from 'src/services/rule.service'
 import { Context } from 'koa'
+import { PayLoadJWT } from '@/types'
 export const createRule = async (ctx: Context) => {
   try {
     const body = ctx.request.body as any as RuleDto
-    const url = ctx.state.user.url as string
-    const result = await handleCreateRule(body, url)
+    const user = ctx.state.user as PayLoadJWT
+    const result = await handleCreateRule(body, user)
     ctx.status = 201
     ctx.body = result
-  } catch (error) {
-    ctx.status = 500
-    console.log(error)
+  } catch (error: any) {
+    ctx.status = error.status || 500
+    ctx.body = { message: error.message }
   }
 }
 
 export const duplicateRule = async (ctx: Context) => {
   try {
     const ruleId = ctx.params.id
-    const duplicated = await handleDuplicateRule(ruleId)
-    if (!duplicated) {
-      ctx.status = 404
-      ctx.body = { message: 'Rule not found' }
-      return
-    }
+    const user = ctx.state.user as PayLoadJWT
+    const { url } = user
+    const duplicated = await handleDuplicateRule(ruleId, url)
 
     ctx.status = 201
     ctx.body = duplicated
-  } catch (error) {
+  } catch (error: any) {
     console.error(error)
-    ctx.status = 500
+    ctx.status = error.status || 500
+    ctx.body = { message: error.message }
   }
 }
 
@@ -49,8 +48,9 @@ export const getRulesBySearch = async (ctx: Context) => {
       ctx.body = { message: 'Missing search keyword' }
       return
     }
-
-    const rules = await handleGetRulesBySearch(keyword)
+    const user = ctx.state.user as PayLoadJWT
+    const { shop } = user
+    const rules = await handleGetRulesBySearch(keyword, shop.shop)
 
     ctx.status = 200
     ctx.body = rules // nếu không tìm thấy, trả về array rỗng
@@ -61,15 +61,16 @@ export const getRulesBySearch = async (ctx: Context) => {
 }
 export const getRule = async (ctx: Context) => {
   try {
-    const name = ctx.params.id
-
-    if (!name) {
+    const id = ctx.params.id
+    const user = ctx.state.user as PayLoadJWT
+    const { shop } = user
+    if (!id) {
       ctx.status = 400
       ctx.body = { message: 'Missing required param.' }
       return
     }
 
-    const rule = await handleGetRuleByName(name)
+    const rule = await handleGetRuleByName(id, shop.shop)
 
     if (!rule) {
       ctx.status = 404
@@ -86,20 +87,24 @@ export const getRule = async (ctx: Context) => {
 export const getRules = async (ctx: Context) => {
   try {
     const page = Number(ctx.query.index) || 0
-    const data = await handleGetRules(page)
+    const user = ctx.state.user as PayLoadJWT
+    const { shop } = user
+    const data = await handleGetRules(page, shop.shop)
     ctx.status = 200
     ctx.body = data
-  } catch (error) {
+  } catch (error: any) {
     console.error(error)
-    ctx.status = 500
+    ctx.status = error.status || 500
+    ctx.body = { message: error.message }
   }
 }
 export const updateRule = async (ctx: Context) => {
   try {
     const ruleId = ctx.params.id
     const body = ctx.request.body as Partial<RuleDto>
+    const user = ctx.state.user as PayLoadJWT
 
-    const success = await handleUpdateRuleById(ruleId, body)
+    const success = await handleUpdateRuleById(ruleId, body, user)
 
     if (success) {
       ctx.status = 200
@@ -116,7 +121,8 @@ export const updateRule = async (ctx: Context) => {
 export const deleteRule = async (ctx: Context) => {
   try {
     const ruleId = ctx.params.id
-    const success = await handleDeleteRuleById(ruleId)
+    const user = ctx.state.user as PayLoadJWT
+    const success = await handleDeleteRuleById(ruleId, user)
 
     if (success) {
       ctx.status = 200
@@ -125,8 +131,9 @@ export const deleteRule = async (ctx: Context) => {
       ctx.status = 404
       ctx.body = { message: 'Rule not found' }
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error(error)
-    ctx.status = 500
+    ctx.status = error.status || 500
+    ctx.body = { message: error.message }
   }
 }

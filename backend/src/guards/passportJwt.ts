@@ -23,6 +23,8 @@ passport.use(
       if (shop) {
         const iss = jwt_payload.iss
         const url = `${iss}/api/${version}/graphql.json`
+        console.log('url', url)
+
         return done(null, { ...jwt_payload, shop, url })
       }
       // 🔹 Nếu không có DB, chấp nhận luôn:
