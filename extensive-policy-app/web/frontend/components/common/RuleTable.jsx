@@ -120,7 +120,7 @@ export default memo(function RuleTable({
 
   const handleDuplicateRule = async (id) => {
     try {
-      await handleFetchApi(`/rules/duplication/${id}`, {
+      await handleFetchApi(`/rules/${id}/duplication`, {
         method: "PUT",
       });
       shopify.toast.show("Created Copy Rule.");
